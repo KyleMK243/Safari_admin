@@ -1,0 +1,33 @@
+# Désactiver l'indexation des dossiers
+Options -Indexes
+
+# Activer le moteur de réécriture
+RewriteEngine On
+
+# Permettre l'accès direct aux fichiers dans /Public
+RewriteCond %{REQUEST_URI} !^/Public/
+
+# Rediriger toutes les autres requêtes vers index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Bloquer l'accès direct à certains dossiers ()
+RedirectMatch 403 ^/(Config|Controller|Model|Views)/?$
+
+# Protéger les fichiers sensibles (Apache 2.4+)
+<FilesMatch "^(\.htaccess|\.htpasswd|\.git|\.env|composer\.json|composer\.lock)$">
+    Require all denied
+</FilesMatch>
+
+# Bloquer l'accès aux fichiers de sauvegarde et temporaires
+<FilesMatch "\.(bak|config|sql|fla|psd|ini|log|sh|inc|swp|dist)$">
+    Require all denied
+</FilesMatch>
+
+# Empêcher lister un répertoire vide
+IndexIgnore *
+
+# Forcer HTTPS si supporté
+# RewriteCond %{HTTPS} !=on
+# RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]

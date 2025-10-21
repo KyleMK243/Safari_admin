@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API v2 - Safari Smart Mobility</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        h2 {
+            color: #764ba2;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: transform 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            background: #2d2d2d;
+            color: #f8f8f2;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .success {
+            border-left: 4px solid #28a745;
+        }
+        
+        .error {
+            border-left: 4px solid #dc3545;
+        }
+        
+        .loading {
+            color: #667eea;
+            font-style: italic;
+        }
+        
+        .info-box {
+            background: #d1ecf1;
+            border-left: 4px solid #0c5460;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test API v2 - Safari Smart Mobility</h1>
+        
+        <div class="info-box">
+            <strong>Base URL:</strong> <code id="baseUrl"></code>
+        </div>
+        
+        <!-- Test API Info -->
+        <div class="test-section">
+            <h2>📋 Informations API</h2>
+            <button onclick="testApiInfo()">Tester GET /</button>
+            <div id="result-info" class="result" style="display:none;"></div>
+        </div>
+        
+        <!-- Test Bus -->
+        <div class="test-section">
+            <h2>🚌 Bus</h2>
+            <button onclick="testGetBus()">GET /bus</button>
+            <button onclick="testGetBusOne()">GET /bus/1</button>
+            <button onclick="testCreateBus()">POST /bus (Créer)</button>
+            <div id="result-bus" class="result" style="display:none;"></div>
+        </div>
+        
+        <!-- Test Utilisateurs -->
+        <div class="test-section">
+            <h2>👥 Utilisateurs</h2>
+            <button onclick="testGetUtilisateurs()">GET /utilisateurs</button>
+            <button onclick="testGetUtilisateurOne()">GET /utilisateurs/1</button>
+            <div id="result-utilisateurs" class="result" style="display:none;"></div>
+        </div>
+        
+        <!-- Test Trajets -->
+        <div class="test-section">
+            <h2>🗺️ Trajets</h2>
+            <button onclick="testGetTrajets()">GET /trajets</button>
+            <button onclick="testCreateTrajet()">POST /trajets (Créer)</button>
+            <div id="result-trajets" class="result" style="display:none;"></div>
+        </div>
+        
+        <!-- Test Billets -->
+        <div class="test-section">
+            <h2>🎫 Billets</h2>
+            <button onclick="testGetBillets()">GET /billets</button>
+            <div id="result-billets" class="result" style="display:none;"></div>
+        </div>
+        
+        <!-- Test Équipe Bord -->
+        <div class="test-section">
+            <h2>👨‍✈️ Équipe de Bord</h2>
+            <button onclick="testGetEquipe()">GET /equipe_bord</button>
+            <button onclick="testCreateEquipe()">POST /equipe_bord (Créer)</button>
+            <div id="result-equipe" class="result" style="display:none;"></div>
+        </div>
+        
+        <!-- Test Colis -->
+        <div class="test-section">
+            <h2>📦 Colis</h2>
+            <button onclick="testGetColis()">GET /colis</button>
+            <div id="result-colis" class="result" style="display:none;"></div>
+        </div>
+        
+        <!-- Test Shifts -->
+        <div class="test-section">
+            <h2>⏰ Shifts</h2>
+            <button onclick="testGetShifts()">GET /shifts</button>
+            <div id="result-shifts" class="result" style="display:none;"></div>
+        </div>
+        
+        <!-- Test Alertes -->
+        <div class="test-section">
+            <h2>🚨 Alertes</h2>
+            <button onclick="testGetAlertes()">GET /alertes</button>
+            <button onclick="testCreateAlerte()">POST /alertes (Créer)</button>
+            <div id="result-alertes" class="result" style="display:none;"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Base URL de l'API - Détection automatique
+        const isProduction = window.location.hostname !== 'localhost';
+        const baseUrl = isProduction 
+            ? 'https://safari.hakika.events/apiv2'
+            : window.location.origin + '/SafariSmartMobily/apiv2';
+        document.getElementById('baseUrl').textContent = baseUrl;
+        
+        // Fonction helper pour afficher les résultats
+        function showResult(elementId, data, isError = false) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = 'result ' + (isError ? 'error' : 'success');
+            element.textContent = JSON.stringify(data, null, 2);
+        }
+        
+        function showLoading(elementId) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = 'result loading';
+            element.textContent = 'Chargement...';
+        }
+        
+        // Test API Info
+        async function testApiInfo() {
+            showLoading('result-info');
+            try {
+                const response = await fetch(baseUrl);
+                const data = await response.json();
+                showResult('result-info', data);
+            } catch (error) {
+                showResult('result-info', { error: error.message }, true);
+            }
+        }
+        
+        // Test Bus
+        async function testGetBus() {
+            showLoading('result-bus');
+            try {
+                const response = await fetch(baseUrl + '/bus');
+                const data = await response.json();
+                showResult('result-bus', data);
+            } catch (error) {
+                showResult('result-bus', { error: error.message }, true);
+            }
+        }
+        
+        async function testGetBusOne() {
+            showLoading('result-bus');
+            try {
+                const response = await fetch(baseUrl + '/bus/1');
+                const data = await response.json();
+                showResult('result-bus', data);
+            } catch (error) {
+                showResult('result-bus', { error: error.message }, true);
+            }
+        }
+        
+        async function testCreateBus() {
+            showLoading('result-bus');
+            try {
+                const busData = {
+                    numero: 'TEST' + Date.now(),
+                    immatriculation: 'TEST-' + Date.now(),
+                    marque: 'Mercedes',
+                    modele: 'Sprinter',
+                    capacite: 50,
+                    statut: 'actif'
+                };
+                
+                const response = await fetch(baseUrl + '/bus', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(busData)
+                });
+                const data = await response.json();
+                showResult('result-bus', data);
+            } catch (error) {
+                showResult('result-bus', { error: error.message }, true);
+            }
+        }
+        
+        // Test Utilisateurs
+        async function testGetUtilisateurs() {
+            showLoading('result-utilisateurs');
+            try {
+                const response = await fetch(baseUrl + '/utilisateurs');
+                const data = await response.json();
+                showResult('result-utilisateurs', data);
+            } catch (error) {
+                showResult('result-utilisateurs', { error: error.message }, true);
+            }
+        }
+        
+        async function testGetUtilisateurOne() {
+            showLoading('result-utilisateurs');
+            try {
+                const response = await fetch(baseUrl + '/utilisateurs/1');
+                const data = await response.json();
+                showResult('result-utilisateurs', data);
+            } catch (error) {
+                showResult('result-utilisateurs', { error: error.message }, true);
+            }
+        }
+        
+        // Test Trajets
+        async function testGetTrajets() {
+            showLoading('result-trajets');
+            try {
+                const response = await fetch(baseUrl + '/trajets');
+                const data = await response.json();
+                showResult('result-trajets', data);
+            } catch (error) {
+                showResult('result-trajets', { error: error.message }, true);
+            }
+        }
+        
+        async function testCreateTrajet() {
+            showLoading('result-trajets');
+            try {
+                const trajetData = {
+                    nom: 'Trajet Test ' + Date.now(),
+                    distance_totale: 150.5,
+                    statut: 'actif'
+                };
+                
+                const response = await fetch(baseUrl + '/trajets', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(trajetData)
+                });
+                const data = await response.json();
+                showResult('result-trajets', data);
+            } catch (error) {
+                showResult('result-trajets', { error: error.message }, true);
+            }
+        }
+        
+        // Test Billets
+        async function testGetBillets() {
+            showLoading('result-billets');
+            try {
+                const response = await fetch(baseUrl + '/billets');
+                const data = await response.json();
+                showResult('result-billets', data);
+            } catch (error) {
+                showResult('result-billets', { error: error.message }, true);
+            }
+        }
+        
+        // Test Équipe Bord
+        async function testGetEquipe() {
+            showLoading('result-equipe');
+            try {
+                const response = await fetch(baseUrl + '/equipe_bord');
+                const data = await response.json();
+                showResult('result-equipe', data);
+            } catch (error) {
+                showResult('result-equipe', { error: error.message }, true);
+            }
+        }
+        
+        async function testCreateEquipe() {
+            showLoading('result-equipe');
+            try {
+                const equipeData = {
+                    nom: 'Test Membre ' + Date.now(),
+                    poste: 'chauffeur',
+                    telephone: '+243123456789',
+                    statut: 'actif'
+                };
+                
+                const response = await fetch(baseUrl + '/equipe_bord', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(equipeData)
+                });
+                const data = await response.json();
+                showResult('result-equipe', data);
+            } catch (error) {
+                showResult('result-equipe', { error: error.message }, true);
+            }
+        }
+        
+        // Test Colis
+        async function testGetColis() {
+            showLoading('result-colis');
+            try {
+                const response = await fetch(baseUrl + '/colis');
+                const data = await response.json();
+                showResult('result-colis', data);
+            } catch (error) {
+                showResult('result-colis', { error: error.message }, true);
+            }
+        }
+        
+        // Test Shifts
+        async function testGetShifts() {
+            showLoading('result-shifts');
+            try {
+                const response = await fetch(baseUrl + '/shifts');
+                const data = await response.json();
+                showResult('result-shifts', data);
+            } catch (error) {
+                showResult('result-shifts', { error: error.message }, true);
+            }
+        }
+        
+        // Test Alertes
+        async function testGetAlertes() {
+            showLoading('result-alertes');
+            try {
+                const response = await fetch(baseUrl + '/alertes');
+                const data = await response.json();
+                showResult('result-alertes', data);
+            } catch (error) {
+                showResult('result-alertes', { error: error.message }, true);
+            }
+        }
+        
+        async function testCreateAlerte() {
+            showLoading('result-alertes');
+            try {
+                const alerteData = {
+                    type_alerte: 'warning',
+                    titre: 'Test Alerte',
+                    message: 'Ceci est une alerte de test créée le ' + new Date().toLocaleString(),
+                    priorite: 'moyenne',
+                    statut: 'nouveau'
+                };
+                
+                const response = await fetch(baseUrl + '/alertes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(alerteData)
+                });
+                const data = await response.json();
+                showResult('result-alertes', data);
+            } catch (error) {
+                showResult('result-alertes', { error: error.message }, true);
+            }
+        }
+    </script>
+</body>
+</html>

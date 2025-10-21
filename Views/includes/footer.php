@@ -1,0 +1,1 @@
+<footer class="footer">© 2024 Dare-Dare. Tous droits réservés. Propulsé par l'intelligence des données.</footer>

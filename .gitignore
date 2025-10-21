@@ -1,0 +1,23 @@
+# Fichiers sensibles
+.env
+
+# Logs
+logs/
+*.log
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Fichiers temporaires
+*.tmp
+*.temp
+*.swp
+*.bak
+
+# Vendor (si vous utilisez Composer)
+vendor/
+
+# Cache
+cache/
