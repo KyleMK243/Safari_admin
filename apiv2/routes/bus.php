@@ -62,7 +62,7 @@ class BusRoutes {
             }
             
             $sql = "INSERT INTO bus (numero, immatriculation, marque, modele, annee, capacite, 
-                    kilometrage, ligne_affectee, statut, modules, notes) 
+                    kilometrage, trajet_id, statut, modules, notes) 
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             
             $stmt = $this->conn->prepare($sql);
@@ -74,7 +74,7 @@ class BusRoutes {
                 $data['annee'] ?? null,
                 $data['capacite'] ?? null,
                 $data['kilometrage'] ?? 0,
-                $data['ligne_affectee'] ?? '',
+                $data['trajet_id'] ?? '',
                 $data['statut'] ?? 'actif',
                 $data['modules'] ?? null,
                 $data['notes'] ?? null
@@ -106,7 +106,7 @@ class BusRoutes {
             
             $sql = "UPDATE bus SET 
                     numero = ?, immatriculation = ?, marque = ?, modele = ?, 
-                    annee = ?, capacite = ?, kilometrage = ?, ligne_affectee = ?, 
+                    annee = ?, capacite = ?, kilometrage = ?, trajet_id = ?, 
                     statut = ?, modules = ?, notes = ?
                     WHERE id = ?";
             
@@ -119,7 +119,7 @@ class BusRoutes {
                 $data['annee'] ?? null,
                 $data['capacite'] ?? null,
                 $data['kilometrage'] ?? 0,
-                $data['ligne_affectee'] ?? '',
+                $data['trajet_id'] ?? '',
                 $data['statut'] ?? 'actif',
                 $data['modules'] ?? null,
                 $data['notes'] ?? null,

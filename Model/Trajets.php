@@ -70,16 +70,21 @@ class Trajets {
         try {
             $this->db->beginTransaction();
             
+            // Générer le code du trajet (L1, L2, L3, etc.)
+            $code = $this->genererCodeTrajet();
+            
             // Insérer le trajet
             $sql = "
-                INSERT INTO trajets (nom, distance_totale, statut, latitude_depart, longitude_depart, latitude_arrivee, longitude_arrivee)
-                VALUES (:nom, :distance_totale, :statut, :latitude_depart, :longitude_depart, :latitude_arrivee, :longitude_arrivee)
+                INSERT INTO trajets (code, nom, distance_totale, statut, couleur, latitude_depart, longitude_depart, latitude_arrivee, longitude_arrivee)
+                VALUES (:code, :nom, :distance_totale, :statut, :couleur, :latitude_depart, :longitude_depart, :latitude_arrivee, :longitude_arrivee)
             ";
             $stmt = $this->db->prepare($sql);
             $success = $stmt->execute([
+                'code' => $code,
                 'nom' => $data['nom'],
                 'distance_totale' => $data['distance_totale'] ?? 0,
                 'statut' => $data['statut'] ?? 'actif',
+                'couleur' => $data['couleur'] ?? null,
                 'latitude_depart' => $data['lat_depart'] ?? null,
                 'longitude_depart' => $data['lon_depart'] ?? null,
                 'latitude_arrivee' => $data['lat_arrivee'] ?? null,
@@ -135,6 +140,7 @@ class Trajets {
                     nom = :nom,
                     distance_totale = :distance_totale,
                     statut = :statut,
+                    couleur = :couleur,
                     latitude_depart = :latitude_depart,
                     longitude_depart = :longitude_depart,
                     latitude_arrivee = :latitude_arrivee,
@@ -146,6 +152,7 @@ class Trajets {
                 'nom' => $data['nom'],
                 'distance_totale' => $data['distance_totale'] ?? 0,
                 'statut' => $data['statut'] ?? 'actif',
+                'couleur' => $data['couleur'] ?? null,
                 'latitude_depart' => $data['lat_depart'] ?? null,
                 'longitude_depart' => $data['lon_depart'] ?? null,
                 'latitude_arrivee' => $data['lat_arrivee'] ?? null,
@@ -359,5 +366,24 @@ class Trajets {
             'distance_avec_debut' => $data['distance_avec_debut'] ?? 0,
             'temp_parcour' => $data['temp_parcour'] ?? 0
         ]);
+    }
+
+    // Générer un code unique pour le trajet (L1, L2, L3, etc.)
+    private function genererCodeTrajet() {
+        // Récupérer le dernier code utilisé
+        $sql = "SELECT code FROM trajets WHERE code LIKE 'L%' ORDER BY CAST(SUBSTRING(code, 2) AS UNSIGNED) DESC LIMIT 1";
+        $stmt = $this->db->query($sql);
+        $dernierCode = $stmt->fetchColumn();
+        
+        if ($dernierCode) {
+            // Extraire le numéro du dernier code (ex: "L11" -> 11)
+            $dernierNumero = (int) substr($dernierCode, 1);
+            $nouveauNumero = $dernierNumero + 1;
+        } else {
+            // Premier trajet
+            $nouveauNumero = 1;
+        }
+        
+        return 'L' . $nouveauNumero;
     }
 }

@@ -215,6 +215,12 @@ switch ($route) {
         $trajetsController = new TrajetsController();
         $trajetsController->save();
         break;
+    
+    case 'trajets/complets':
+        require_once ROOT_PATH . '/Controller/TrajetsController.php';
+        $trajetsController = new TrajetsController();
+        $trajetsController->getTrajetsComplets();
+        break;
 
     // Partie Tarifs
     case 'tarifs':

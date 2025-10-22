@@ -10,6 +10,37 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="Public/css/styles.css" />
   <script src="https://unpkg.com/feather-icons"></script>
+  <!-- Google Maps API -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCokbp76WRQybewzj87ZwNeT6xdplTSyPA&libraries=places"></script>
+  <style>
+    .map-selector-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      background: #10b981;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .map-selector-btn:hover {
+      background: #059669;
+      transform: translateY(-1px);
+    }
+    .map-container {
+      width: 100%;
+      height: 400px;
+      border-radius: 8px;
+      margin-top: 12px;
+    }
+    #mapModal .modal__content {
+      max-width: 800px;
+    }
+  </style>
 </head>
 <body>
   <div class="app">
@@ -53,6 +84,7 @@
               <table class="table" style="white-space: nowrap;">
                   <thead>
                       <tr>
+                          <th>Code</th>
                           <th>Nom du trajet</th>
                           <th>Distance totale</th>
                           <th>Nombre d'arrêts</th>
@@ -65,6 +97,11 @@
                       <?php if (!empty($trajets)) : ?>
                           <?php foreach ($trajets as $trajet) : ?>
                               <tr>
+                                  <td>
+                                      <span style="background: <?= htmlspecialchars($trajet['couleur'] ?? '#3b82f6') ?>; color: white; padding: 4px 8px; border-radius: 4px; font-weight: 700; font-size: 12px;">
+                                          <?= htmlspecialchars($trajet['code'] ?? '-') ?>
+                                      </span>
+                                  </td>
                                   <td><?= htmlspecialchars($trajet['nom']) ?></td>
                                   <td><?= htmlspecialchars($trajet['distance_totale']) ?> km</td>
                                   <td>
@@ -101,7 +138,7 @@
                           <?php endforeach; ?>
                       <?php else: ?>
                           <tr>
-                              <td colspan="6" class="text-center">Aucun trajet disponible</td>
+                              <td colspan="7" class="text-center">Aucun trajet disponible</td>
                           </tr>
                       <?php endif; ?>
                   </tbody>
@@ -240,27 +277,51 @@
             </div>
           </div>
 
-          <h4 style="margin: 20px 0 12px; color: #374151; display: flex; align-items: center; gap: 8px;"><i data-feather="navigation" style="width: 16px; height: 16px;"></i> Point de départ</h4>
+          <div class="form-group" style="margin-bottom: 20px;">
+            <label for="trajetCouleur">Couleur du trajet sur la carte</label>
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <input type="color" id="trajetCouleur" name="trajetCouleur" value="#3b82f6" class="form-control" style="width: 80px; height: 40px; padding: 4px; cursor: pointer;">
+              <input type="text" id="trajetCouleurHex" placeholder="#3b82f6" maxlength="7" pattern="^#[0-9A-Fa-f]{6}$" class="form-control" style="flex: 1;" value="#3b82f6">
+              <span style="font-size: 12px; color: #6b7280;">Code hexadécimal (ex: #3b82f6)</span>
+            </div>
+            <small style="color: #6b7280; font-size: 12px; margin-top: 4px; display: block;">Cette couleur sera utilisée pour afficher le trajet, les arrêts et les shifts sur la carte</small>
+          </div>
+
+          <h4 style="margin: 20px 0 12px; color: #374151; display: flex; align-items: center; gap: 8px; justify-content: space-between;">
+            <span style="display: flex; align-items: center; gap: 8px;">
+              <i data-feather="navigation" style="width: 16px; height: 16px;"></i> Point de départ
+            </span>
+            <button type="button" class="map-selector-btn" onclick="ouvrirCarteDepart()">
+              <i data-feather="map" style="width: 14px; height: 14px;"></i> Sélectionner sur la carte
+            </button>
+          </h4>
           <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
             <div class="form-group">
               <label for="latDepart">Latitude départ *</label>
-              <input type="number" id="latDepart" step="0.000001" min="-90" max="90" required placeholder="-4.3217" class="form-control">
+              <input type="number" id="latDepart" step="0.000001" min="-90" max="90" required placeholder="-4.3217" class="form-control" readonly>
             </div>
             <div class="form-group">
               <label for="lonDepart">Longitude départ *</label>
-              <input type="number" id="lonDepart" step="0.000001" min="-180" max="180" required placeholder="15.3125" class="form-control">
+              <input type="number" id="lonDepart" step="0.000001" min="-180" max="180" required placeholder="15.3125" class="form-control" readonly>
             </div>
           </div>
 
-          <h4 style="margin: 20px 0 12px; color: #374151; display: flex; align-items: center; gap: 8px;"><i data-feather="flag" style="width: 16px; height: 16px;"></i> Point d'arrivée</h4>
+          <h4 style="margin: 20px 0 12px; color: #374151; display: flex; align-items: center; gap: 8px; justify-content: space-between;">
+            <span style="display: flex; align-items: center; gap: 8px;">
+              <i data-feather="flag" style="width: 16px; height: 16px;"></i> Point d'arrivée
+            </span>
+            <button type="button" class="map-selector-btn" onclick="ouvrirCarteArrivee()">
+              <i data-feather="map" style="width: 14px; height: 14px;"></i> Sélectionner sur la carte
+            </button>
+          </h4>
           <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
             <div class="form-group">
               <label for="latArrivee">Latitude arrivée *</label>
-              <input type="number" id="latArrivee" step="0.000001" min="-90" max="90" required placeholder="-5.8167" class="form-control">
+              <input type="number" id="latArrivee" step="0.000001" min="-90" max="90" required placeholder="-5.8167" class="form-control" readonly>
             </div>
             <div class="form-group">
               <label for="lonArrivee">Longitude arrivée *</label>
-              <input type="number" id="lonArrivee" step="0.000001" min="-180" max="180" required placeholder="13.4583" class="form-control">
+              <input type="number" id="lonArrivee" step="0.000001" min="-180" max="180" required placeholder="13.4583" class="form-control" readonly>
             </div>
           </div>
 
@@ -424,6 +485,11 @@
             document.getElementById('trajetNom').value = trajet.nom;
             document.getElementById('trajetStatut').value = trajet.statut;
             
+            // Remplir la couleur
+            const couleur = trajet.couleur || '#3b82f6';
+            document.getElementById('trajetCouleur').value = couleur;
+            document.getElementById('trajetCouleurHex').value = couleur;
+            
             // Remplir les coordonnées GPS
             document.getElementById('latDepart').value = trajet.latitude_depart || '';
             document.getElementById('lonDepart').value = trajet.longitude_depart || '';
@@ -446,9 +512,14 @@
                 <div class="arret-item" id="arret${arretIndex}" style="background: #f9fafb; padding: 16px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #e5e7eb;">
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                     <h4 style="margin: 0; color: #374151;">Arrêt #${arretIndex}</h4>
-                    <button type="button" class="btn-icon btn-icon--delete" onclick="supprimerArret(${arretIndex})">
-                      <i data-feather="trash-2"></i>
-                    </button>
+                    <div style="display: flex; gap: 8px;">
+                      <button type="button" class="map-selector-btn" onclick="ouvrirCarteArret(${arretIndex})" style="font-size: 11px; padding: 6px 10px;">
+                        <i data-feather="map" style="width: 12px; height: 12px;"></i> Carte
+                      </button>
+                      <button type="button" class="btn-icon btn-icon--delete" onclick="supprimerArret(${arretIndex})">
+                        <i data-feather="trash-2"></i>
+                      </button>
+                    </div>
                   </div>
                   <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
                     <div class="form-group" style="margin: 0;">
@@ -457,11 +528,11 @@
                     </div>
                     <div class="form-group" style="margin: 0;">
                       <label>Latitude *</label>
-                      <input type="number" class="form-control arret-lat" data-index="${arretIndex}" step="0.000001" min="-90" max="90" value="${arret.latitude || ''}">
+                      <input type="number" class="form-control arret-lat" data-index="${arretIndex}" step="0.000001" min="-90" max="90" value="${arret.latitude || ''}" readonly>
                     </div>
                     <div class="form-group" style="margin: 0;">
                       <label>Longitude *</label>
-                      <input type="number" class="form-control arret-lon" data-index="${arretIndex}" step="0.000001" min="-180" max="180" value="${arret.longitude || ''}">
+                      <input type="number" class="form-control arret-lon" data-index="${arretIndex}" step="0.000001" min="-180" max="180" value="${arret.longitude || ''}" readonly>
                     </div>
                   </div>
                   <div style="background: #e0f2fe; padding: 12px; border-radius: 6px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
@@ -496,9 +567,14 @@
                 <div class="shift-item" id="shift${shiftIndex}" style="background: #f9fafb; padding: 16px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #e5e7eb;">
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                     <h4 style="margin: 0; color: #374151;">Shift #${shiftIndex}</h4>
-                    <button type="button" class="btn-icon btn-icon--delete" onclick="supprimerShift(${shiftIndex})">
-                      <i data-feather="trash-2"></i>
-                    </button>
+                    <div style="display: flex; gap: 8px;">
+                      <button type="button" class="map-selector-btn" onclick="ouvrirCarteShift(${shiftIndex})" style="font-size: 11px; padding: 6px 10px;">
+                        <i data-feather="map" style="width: 12px; height: 12px;"></i> Carte
+                      </button>
+                      <button type="button" class="btn-icon btn-icon--delete" onclick="supprimerShift(${shiftIndex})">
+                        <i data-feather="trash-2"></i>
+                      </button>
+                    </div>
                   </div>
                   <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
                     <div class="form-group" style="margin: 0;">
@@ -507,11 +583,11 @@
                     </div>
                     <div class="form-group" style="margin: 0;">
                       <label>Latitude *</label>
-                      <input type="number" class="form-control shift-lat" data-index="${shiftIndex}" step="0.000001" min="-90" max="90" value="${shift.latitude || ''}">
+                      <input type="number" class="form-control shift-lat" data-index="${shiftIndex}" step="0.000001" min="-90" max="90" value="${shift.latitude || ''}" readonly>
                     </div>
                     <div class="form-group" style="margin: 0;">
                       <label>Longitude *</label>
-                      <input type="number" class="form-control shift-lon" data-index="${shiftIndex}" step="0.000001" min="-180" max="180" value="${shift.longitude || ''}">
+                      <input type="number" class="form-control shift-lon" data-index="${shiftIndex}" step="0.000001" min="-180" max="180" value="${shift.longitude || ''}" readonly>
                     </div>
                   </div>
                   <div style="background: #fef3c7; padding: 12px; border-radius: 6px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
@@ -748,6 +824,36 @@
       document.getElementById('btnSuivant').style.display = etape < totalSteps ? 'inline-flex' : 'none';
       document.getElementById('btnEnregistrer').style.display = etape === totalSteps ? 'inline-flex' : 'none';
 
+      // Si on revient à l'étape 1, recalculer la distance et le temps
+      if (etape === 1) {
+        calculerDistanceTrajet();
+      }
+      
+      // Si on est à l'étape 2, recalculer les distances des arrêts
+      if (etape === 2) {
+        document.querySelectorAll('.arret-item').forEach((item) => {
+          const index = item.querySelector('.arret-lat').getAttribute('data-index');
+          if (index) {
+            calculerDistanceArret(parseInt(index));
+          }
+        });
+      }
+      
+      // Si on est à l'étape 3, recalculer les distances des shifts
+      if (etape === 3) {
+        document.querySelectorAll('.shift-item').forEach((item) => {
+          const index = item.querySelector('.shift-lat').getAttribute('data-index');
+          if (index) {
+            calculerDistanceShift(parseInt(index));
+          }
+        });
+      }
+      
+      // Si on est à l'étape 4 (résumé), générer le résumé
+      if (etape === 4) {
+        genererResume();
+      }
+
       // Rafraîchir les icônes
       feather.replace();
     }
@@ -804,18 +910,26 @@
               <i data-feather="trash-2"></i>
             </button>
           </div>
-          <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-            <div class="form-group" style="margin: 0;">
+          <div style="margin-bottom: 12px;">
+            <div class="form-group" style="margin: 0 0 12px 0;">
               <label>Nom de l'arrêt *</label>
               <input type="text" class="form-control arret-nom" data-index="${arretIndex}" placeholder="Ex: Gare centrale">
             </div>
-            <div class="form-group" style="margin: 0;">
-              <label>Latitude *</label>
-              <input type="number" class="form-control arret-lat" data-index="${arretIndex}" step="0.000001" min="-90" max="90">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span style="font-size: 13px; font-weight: 600; color: #374151;">Coordonnées GPS</span>
+              <button type="button" class="map-selector-btn" onclick="ouvrirCarteArret(${arretIndex})" style="font-size: 12px; padding: 6px 10px;">
+                <i data-feather="map" style="width: 12px; height: 12px;"></i> Sélectionner sur la carte
+              </button>
             </div>
-            <div class="form-group" style="margin: 0;">
-              <label>Longitude *</label>
-              <input type="number" class="form-control arret-lon" data-index="${arretIndex}" step="0.000001" min="-180" max="180">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="form-group" style="margin: 0;">
+                <label>Latitude *</label>
+                <input type="number" class="form-control arret-lat" data-index="${arretIndex}" step="0.000001" min="-90" max="90" readonly>
+              </div>
+              <div class="form-group" style="margin: 0;">
+                <label>Longitude *</label>
+                <input type="number" class="form-control arret-lon" data-index="${arretIndex}" step="0.000001" min="-180" max="180" readonly>
+              </div>
             </div>
           </div>
           <div style="background: #e0f2fe; padding: 12px; border-radius: 6px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
@@ -855,9 +969,19 @@
         const distance = calculerDistance(latDepart, lonDepart, latArret, lonArret);
         const temps = calculerTemps(distance);
         
-        document.getElementById('arretDistance' + index).value = distance.toFixed(2) + ' km';
-        document.getElementById('arretTemps' + index).value = Math.round(temps) + ' min';
+        document.getElementById(`arretDistance${index}`).value = distance.toFixed(2) + ' km';
+        document.getElementById(`arretTemps${index}`).value = Math.round(temps) + ' min';
       }
+    }
+    
+    // Recalculer tous les arrêts
+    function recalculerTousLesArrets() {
+      document.querySelectorAll('.arret-item').forEach((item) => {
+        const index = item.querySelector('.arret-lat')?.getAttribute('data-index');
+        if (index) {
+          calculerDistanceArret(parseInt(index));
+        }
+      });
     }
 
     // Supprimer un arrêt
@@ -879,18 +1003,26 @@
               <i data-feather="trash-2"></i>
             </button>
           </div>
-          <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-            <div class="form-group" style="margin: 0;">
+          <div style="margin-bottom: 12px;">
+            <div class="form-group" style="margin: 0 0 12px 0;">
               <label>Nom du shift *</label>
               <input type="text" class="form-control shift-nom" data-index="${shiftIndex}" placeholder="Ex: Shift matin">
             </div>
-            <div class="form-group" style="margin: 0;">
-              <label>Latitude *</label>
-              <input type="number" class="form-control shift-lat" data-index="${shiftIndex}" step="0.000001" min="-90" max="90">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span style="font-size: 13px; font-weight: 600; color: #374151;">Coordonnées GPS</span>
+              <button type="button" class="map-selector-btn" onclick="ouvrirCarteShift(${shiftIndex})" style="font-size: 12px; padding: 6px 10px;">
+                <i data-feather="map" style="width: 12px; height: 12px;"></i> Sélectionner sur la carte
+              </button>
             </div>
-            <div class="form-group" style="margin: 0;">
-              <label>Longitude *</label>
-              <input type="number" class="form-control shift-lon" data-index="${shiftIndex}" step="0.000001" min="-180" max="180">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="form-group" style="margin: 0;">
+                <label>Latitude *</label>
+                <input type="number" class="form-control shift-lat" data-index="${shiftIndex}" step="0.000001" min="-90" max="90" readonly>
+              </div>
+              <div class="form-group" style="margin: 0;">
+                <label>Longitude *</label>
+                <input type="number" class="form-control shift-lon" data-index="${shiftIndex}" step="0.000001" min="-180" max="180" readonly>
+              </div>
             </div>
           </div>
           <div style="background: #fef3c7; padding: 12px; border-radius: 6px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
@@ -933,6 +1065,16 @@
         document.getElementById('shiftDistance' + index).value = distance.toFixed(2) + ' km';
         document.getElementById('shiftTemps' + index).value = Math.round(temps) + ' min';
       }
+    }
+    
+    // Recalculer tous les shifts
+    function recalculerTousLesShifts() {
+      document.querySelectorAll('.shift-item').forEach((item) => {
+        const index = item.querySelector('.shift-lat')?.getAttribute('data-index');
+        if (index) {
+          calculerDistanceShift(parseInt(index));
+        }
+      });
     }
 
     // Supprimer un shift
@@ -1069,6 +1211,7 @@
         id: document.getElementById('trajetId').value,
         nom: document.getElementById('trajetNom').value,
         statut: document.getElementById('trajetStatut').value,
+        couleur: document.getElementById('trajetCouleurHex').value || '#3b82f6',
         lat_depart: document.getElementById('latDepart').value,
         lon_depart: document.getElementById('lonDepart').value,
         lat_arrivee: document.getElementById('latArrivee').value,
@@ -1150,8 +1293,247 @@
     });
     }
     
+    // Synchroniser les champs de couleur
+    const trajetCouleur = document.getElementById('trajetCouleur');
+    const trajetCouleurHex = document.getElementById('trajetCouleurHex');
+    
+    if (trajetCouleur && trajetCouleurHex) {
+      // Quand le color picker change, mettre à jour le champ texte
+      trajetCouleur.addEventListener('input', (e) => {
+        trajetCouleurHex.value = e.target.value.toUpperCase();
+      });
+      
+      // Quand le champ texte change, mettre à jour le color picker
+      trajetCouleurHex.addEventListener('input', (e) => {
+        const value = e.target.value.trim();
+        // Vérifier si c'est un code hexadécimal valide
+        if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+          trajetCouleur.value = value;
+        }
+      });
+    }
+    
     // Initialisation des icônes Feather
     setTimeout(() => feather.replace(), 10);
+  </script>
+
+  <!-- Modal pour sélectionner une position sur Google Maps -->
+  <div class="modal" id="mapModal">
+    <div class="modal__overlay" onclick="fermerCarteModal()"></div>
+    <div class="modal__content">
+      <div class="modal__header">
+        <h2 id="mapModalTitle">Sélectionner une position sur la carte</h2>
+        <button class="modal__close" onclick="fermerCarteModal()">
+          <i data-feather="x"></i>
+        </button>
+      </div>
+      
+      <div class="modal__body" style="padding: 20px;">
+        <p style="margin-bottom: 12px; color: #6b7280; font-size: 14px;">
+          <i data-feather="info" style="width: 16px; height: 16px; display: inline; vertical-align: middle;"></i>
+          Cliquez sur la carte pour sélectionner une position. Vous pouvez aussi rechercher une adresse.
+        </p>
+        
+        <!-- Barre de recherche -->
+        <div style="margin-bottom: 16px;">
+          <input type="text" id="mapSearchInput" placeholder="Rechercher une adresse (ex: Kinshasa, RDC)" 
+                 style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+        </div>
+        
+        <!-- Carte Google Maps -->
+        <div id="googleMap" class="map-container"></div>
+        
+        <!-- Coordonnées sélectionnées -->
+        <div style="margin-top: 16px; padding: 12px; background: #f0f9ff; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <strong style="color: #0369a1;">Position sélectionnée:</strong>
+            <div style="font-size: 13px; color: #6b7280; margin-top: 4px;">
+              Lat: <span id="selectedLat">--</span> | Lon: <span id="selectedLon">--</span>
+            </div>
+          </div>
+          <button type="button" class="btn btn--primary" onclick="confirmerPosition()" id="btnConfirmerPosition" disabled>
+            <i data-feather="check"></i> Confirmer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let map;
+    let marker;
+    let currentMapTarget = null; // 'depart', 'arrivee', 'arret', 'shift'
+    let currentArretIndex = null;
+    let currentShiftIndex = null;
+    let selectedLatitude = null;
+    let selectedLongitude = null;
+
+    // Initialiser Google Maps
+    function initMap(lat = -4.3217, lng = 15.3125) {
+      const mapOptions = {
+        center: { lat: lat, lng: lng },
+        zoom: 12,
+        mapTypeControl: true,
+        streetViewControl: false,
+        fullscreenControl: true
+      };
+
+      map = new google.maps.Map(document.getElementById('googleMap'), mapOptions);
+
+      // Ajouter un marqueur
+      marker = new google.maps.Marker({
+        position: { lat: lat, lng: lng },
+        map: map,
+        draggable: true,
+        title: 'Position sélectionnée'
+      });
+
+      // Écouter les clics sur la carte
+      map.addListener('click', (event) => {
+        updateMarkerPosition(event.latLng);
+      });
+
+      // Écouter le déplacement du marqueur
+      marker.addListener('dragend', (event) => {
+        updateMarkerPosition(event.latLng);
+      });
+
+      // Initialiser la recherche d'adresse
+      const searchInput = document.getElementById('mapSearchInput');
+      const searchBox = new google.maps.places.SearchBox(searchInput);
+
+      map.addListener('bounds_changed', () => {
+        searchBox.setBounds(map.getBounds());
+      });
+
+      searchBox.addListener('places_changed', () => {
+        const places = searchBox.getPlaces();
+        if (places.length === 0) return;
+
+        const place = places[0];
+        if (!place.geometry || !place.geometry.location) return;
+
+        map.setCenter(place.geometry.location);
+        map.setZoom(15);
+        updateMarkerPosition(place.geometry.location);
+      });
+    }
+
+    // Mettre à jour la position du marqueur
+    function updateMarkerPosition(latLng) {
+      marker.setPosition(latLng);
+      selectedLatitude = latLng.lat();
+      selectedLongitude = latLng.lng();
+      
+      document.getElementById('selectedLat').textContent = selectedLatitude.toFixed(6);
+      document.getElementById('selectedLon').textContent = selectedLongitude.toFixed(6);
+      document.getElementById('btnConfirmerPosition').disabled = false;
+    }
+
+    // Ouvrir la carte pour le point de départ
+    function ouvrirCarteDepart() {
+      currentMapTarget = 'depart';
+      const lat = parseFloat(document.getElementById('latDepart').value) || -4.3217;
+      const lng = parseFloat(document.getElementById('lonDepart').value) || 15.3125;
+      
+      document.getElementById('mapModalTitle').textContent = 'Sélectionner le point de départ';
+      document.getElementById('mapModal').classList.add('active');
+      
+      setTimeout(() => {
+        initMap(lat, lng);
+        feather.replace();
+      }, 100);
+    }
+
+    // Ouvrir la carte pour le point d'arrivée
+    function ouvrirCarteArrivee() {
+      currentMapTarget = 'arrivee';
+      const lat = parseFloat(document.getElementById('latArrivee').value) || -5.8167;
+      const lng = parseFloat(document.getElementById('lonArrivee').value) || 13.4583;
+      
+      document.getElementById('mapModalTitle').textContent = 'Sélectionner le point d\'arrivée';
+      document.getElementById('mapModal').classList.add('active');
+      
+      setTimeout(() => {
+        initMap(lat, lng);
+        feather.replace();
+      }, 100);
+    }
+
+    // Ouvrir la carte pour un arrêt
+    function ouvrirCarteArret(index) {
+      currentMapTarget = 'arret';
+      currentArretIndex = index;
+      const latInput = document.querySelector(`.arret-lat[data-index="${index}"]`);
+      const lonInput = document.querySelector(`.arret-lon[data-index="${index}"]`);
+      const lat = parseFloat(latInput.value) || -4.3217;
+      const lng = parseFloat(lonInput.value) || 15.3125;
+      
+      document.getElementById('mapModalTitle').textContent = 'Sélectionner la position de l\'arrêt';
+      document.getElementById('mapModal').classList.add('active');
+      
+      setTimeout(() => {
+        initMap(lat, lng);
+        feather.replace();
+      }, 100);
+    }
+
+    // Ouvrir la carte pour un shift
+    function ouvrirCarteShift(index) {
+      currentMapTarget = 'shift';
+      currentShiftIndex = index;
+      const latInput = document.querySelector(`.shift-lat[data-index="${index}"]`);
+      const lonInput = document.querySelector(`.shift-lon[data-index="${index}"]`);
+      const lat = parseFloat(latInput.value) || -4.3217;
+      const lng = parseFloat(lonInput.value) || 15.3125;
+      
+      document.getElementById('mapModalTitle').textContent = 'Sélectionner la position du point de chifte';
+      document.getElementById('mapModal').classList.add('active');
+      
+      setTimeout(() => {
+        initMap(lat, lng);
+        feather.replace();
+      }, 100);
+    }
+
+    // Confirmer la position sélectionnée
+    function confirmerPosition() {
+      if (selectedLatitude === null || selectedLongitude === null) return;
+
+      if (currentMapTarget === 'depart') {
+        document.getElementById('latDepart').value = selectedLatitude.toFixed(6);
+        document.getElementById('lonDepart').value = selectedLongitude.toFixed(6);
+        // Déclencher le recalcul
+        calculerDistanceTrajet();
+        // Recalculer aussi les arrêts et shifts si ils existent
+        recalculerTousLesArrets();
+        recalculerTousLesShifts();
+      } else if (currentMapTarget === 'arrivee') {
+        document.getElementById('latArrivee').value = selectedLatitude.toFixed(6);
+        document.getElementById('lonArrivee').value = selectedLongitude.toFixed(6);
+        calculerDistanceTrajet();
+      } else if (currentMapTarget === 'arret') {
+        document.querySelector(`.arret-lat[data-index="${currentArretIndex}"]`).value = selectedLatitude.toFixed(6);
+        document.querySelector(`.arret-lon[data-index="${currentArretIndex}"]`).value = selectedLongitude.toFixed(6);
+        calculerDistanceArret(currentArretIndex);
+      } else if (currentMapTarget === 'shift') {
+        document.querySelector(`.shift-lat[data-index="${currentShiftIndex}"]`).value = selectedLatitude.toFixed(6);
+        document.querySelector(`.shift-lon[data-index="${currentShiftIndex}"]`).value = selectedLongitude.toFixed(6);
+        calculerDistanceShift(currentShiftIndex);
+      }
+
+      fermerCarteModal();
+    }
+
+    // Fermer le modal de la carte
+    function fermerCarteModal() {
+      document.getElementById('mapModal').classList.remove('active');
+      selectedLatitude = null;
+      selectedLongitude = null;
+      document.getElementById('selectedLat').textContent = '--';
+      document.getElementById('selectedLon').textContent = '--';
+      document.getElementById('btnConfirmerPosition').disabled = true;
+    }
   </script>
 </body>
 </html>

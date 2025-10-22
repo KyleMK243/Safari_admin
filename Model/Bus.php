@@ -12,7 +12,7 @@ class Bus {
         $sql = "
             SELECT 
                 b.id, b.numero, b.immatriculation, b.marque, b.modele, b.annee,
-                b.capacite, b.kilometrage, b.ligne_affectee, b.statut,
+                b.capacite, b.kilometrage, b.trajet_id, b.statut,
                 b.derniere_activite, b.date_creation, b.modules, b.notes,
                 COALESCE(
                     (SELECT e.nom 
@@ -31,7 +31,7 @@ class Bus {
             $sql .= " AND statut = :statut ";
         }
         if ($ligne !== null) {
-            $sql .= " AND ligne_affectee = :ligne ";
+            $sql .= " AND trajet_id = :ligne ";
         }
 
         $sql .= " ORDER BY date_creation DESC
@@ -63,12 +63,12 @@ class Bus {
             
             $sql = "SELECT 
                     b.id, b.numero, b.immatriculation, b.marque, b.modele, b.annee,
-                    b.capacite, b.kilometrage, b.ligne_affectee, b.statut,
+                    b.capacite, b.kilometrage, b.trajet_id, b.statut,
                     b.derniere_activite, b.date_creation, b.modules, b.notes,
                     t.nom as trajet_nom,
                     '-' as chauffeur
                 FROM bus b
-                LEFT JOIN trajets t ON b.ligne_affectee = t.id
+                LEFT JOIN trajets t ON b.trajet_id = t.id
                 WHERE 1=1";
 
             $params = [];
@@ -80,9 +80,9 @@ class Bus {
             
             if ($filtreTrajet !== null) {
                 if ($filtreTrajet === 'non_affecte') {
-                    $sql .= " AND (b.ligne_affectee IS NULL OR b.ligne_affectee = '')";
+                    $sql .= " AND (b.trajet_id IS NULL OR b.trajet_id = '')";
                 } else {
-                    $sql .= " AND b.ligne_affectee = ?";
+                    $sql .= " AND b.trajet_id = ?";
                     $params[] = $filtreTrajet;
                 }
             }
@@ -125,7 +125,7 @@ class Bus {
             $sql .= " AND statut = :statut ";
         }
         if ($ligne !== null) {
-            $sql .= " AND ligne_affectee = :ligne ";
+            $sql .= " AND trajet_id = :ligne ";
         }
 
         $stmt = $this->db->prepare($sql);
@@ -144,7 +144,7 @@ class Bus {
     public function chercherBus($motCle) {
         $sql = "
             SELECT 
-                id, numero, immatriculation, marque, modele, ligne_affectee,
+                id, numero, immatriculation, marque, modele, trajet_id,
                 capacite, statut, kilometrage
             FROM bus
             WHERE 
@@ -166,7 +166,7 @@ class Bus {
                 b.*,
                 t.nom AS trajet_nom
             FROM bus b
-            LEFT JOIN trajets t ON b.ligne_affectee = t.id
+            LEFT JOIN trajets t ON b.trajet_id = t.id
             WHERE b.id = :id
         ";
         $stmt = $this->db->prepare($sql);
@@ -180,10 +180,10 @@ class Bus {
         $sql = "
             INSERT INTO bus (
                 numero, immatriculation, marque, modele, annee, capacite, kilometrage,
-                ligne_affectee, statut, modules, notes, derniere_activite
+                trajet_id, statut, modules, notes, derniere_activite
             ) VALUES (
                 :numero, :immatriculation, :marque, :modele, :annee, :capacite, :kilometrage,
-                :ligne_affectee, :statut, :modules, :notes, :derniere_activite
+                :trajet_id, :statut, :modules, :notes, :derniere_activite
             )
         ";
 
@@ -202,7 +202,7 @@ class Bus {
                 annee = :annee,
                 capacite = :capacite,
                 kilometrage = :kilometrage,
-                ligne_affectee = :ligne_affectee,
+                trajet_id = :trajet_id,
                 statut = :statut,
                 modules = :modules,
                 notes = :notes,
@@ -283,7 +283,7 @@ class Bus {
 
     // 14. Récupérer la liste des lignes disponibles (pour filtre)
     public function getLignesDisponibles() {
-        $sql = "SELECT DISTINCT ligne_affectee FROM bus WHERE ligne_affectee IS NOT NULL AND ligne_affectee <> '' ORDER BY ligne_affectee ASC";
+        $sql = "SELECT DISTINCT trajet_id FROM bus WHERE trajet_id IS NOT NULL AND trajet_id <> '' ORDER BY trajet_id ASC";
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }

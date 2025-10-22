@@ -412,6 +412,7 @@ class TrajetsController {
             $trajetData = [
                 'nom' => $data['nom'],
                 'statut' => $data['statut'] ?? 'actif',
+                'couleur' => $data['couleur'] ?? null,
                 'distance_totale' => $data['distance_totale'] ?? 0,
                 'lat_depart' => $data['lat_depart'] ?? null,
                 'lon_depart' => $data['lon_depart'] ?? null,
@@ -475,6 +476,68 @@ class TrajetsController {
         } catch (Exception $e) {
             error_log("ERREUR SAVE TRAJET: " . $e->getMessage());
             http_response_code(400);
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+        exit;
+    }
+
+    /**
+     * Récupérer tous les trajets avec leurs arrêts et shifts (AJAX) - Pour affichage sur carte
+     */
+    public function getTrajetsComplets() {
+        header('Content-Type: application/json');
+        
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            http_response_code(405);
+            echo json_encode(['success' => false, 'message' => 'Méthode non autorisée']);
+            exit;
+        }
+
+        try {
+            error_log("=== GET TRAJETS COMPLETS ===");
+            
+            // Récupérer tous les trajets (avec pagination par défaut)
+            $trajets = $this->trajetModel->getTrajets(1000, 0); // Limite à 1000 trajets
+            error_log("Nombre de trajets: " . count($trajets));
+            
+            $trajetsComplets = [];
+            
+            foreach ($trajets as $trajet) {
+                // Récupérer les arrêts du trajet
+                $arrets = $this->trajetModel->getArretsByTrajet($trajet['id']);
+                
+                // Récupérer les shifts du trajet
+                $shifts = $this->trajetModel->getPointsChifteByTrajet($trajet['id']);
+                
+                $trajetsComplets[] = [
+                    'id' => $trajet['id'],
+                    'code' => $trajet['code'],
+                    'nom' => $trajet['nom'],
+                    'statut' => $trajet['statut'],
+                    'distance_totale' => $trajet['distance_totale'],
+                    'latitude_depart' => $trajet['latitude_depart'],
+                    'longitude_depart' => $trajet['longitude_depart'],
+                    'latitude_arrivee' => $trajet['latitude_arrivee'],
+                    'longitude_arrivee' => $trajet['longitude_arrivee'],
+                    'arrets' => $arrets,
+                    'shifts' => $shifts
+                ];
+            }
+            
+            error_log("Trajets complets préparés: " . count($trajetsComplets));
+            
+            echo json_encode([
+                'success' => true,
+                'trajets' => $trajetsComplets
+            ]);
+            
+        } catch (Exception $e) {
+            error_log("❌ Erreur getTrajetsComplets: " . $e->getMessage());
+            error_log("Stack trace: " . $e->getTraceAsString());
+            http_response_code(500);
             echo json_encode([
                 'success' => false,
                 'message' => $e->getMessage()

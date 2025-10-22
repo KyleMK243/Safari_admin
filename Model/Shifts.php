@@ -416,7 +416,7 @@ class Shifts {
                 0 as frequence,
                 'aleatoire' as source
             FROM bus b
-            LEFT JOIN trajets t ON b.ligne_affectee = t.id
+            LEFT JOIN trajets t ON b.trajet_id = t.id
             WHERE b.statut = 'actif'
             ORDER BY RAND()
             LIMIT ?

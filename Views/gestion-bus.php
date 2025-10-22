@@ -363,7 +363,7 @@
           $("annee").value = bus.annee ?? "";
           $("capacite").value = bus.capacite ?? "";
           $("kilometrage").value = bus.kilometrage ?? "";
-          $("ligneAffectee").value = bus.ligne_affectee ?? bus.ligne ?? "";
+          $("ligneAffectee").value = bus.trajet_id ?? bus.ligne ?? "";
           $("statut").value = bus.statut ?? "disponible";
           $("notes").value = bus.notes ?? "";
 
@@ -411,7 +411,7 @@
           annee: $("annee")?.value || 0,
           capacite: $("capacite")?.value || 0,
           kilometrage: $("kilometrage")?.value || 0,
-          ligne_affectee: $("ligneAffectee")?.value || null,
+          trajet_id: $("ligneAffectee")?.value || null,
           statut: $("statut")?.value || "disponible",
           modules: modulesChecked.join(","), // ✅ envoyé sous forme de chaîne CSV
           notes: $("notes")?.value.trim() || ""
@@ -480,7 +480,7 @@
               'annee' => (int) ($bus['annee'] ?? 0),
               'capacite' => (int) ($bus['capacite'] ?? 0),
               'kilometrage' => (int) ($bus['kilometrage'] ?? 0),
-              'ligne_affectee' => $bus['ligne_affectee'] ?? '',
+              'trajet_id' => $bus['trajet_id'] ?? '',
               'trajet_nom' => $bus['trajet_nom'] ?? 'Non affecté',
               'statut' => $bus['statut'] ?? 'disponible',
               'chauffeur' => $bus['chauffeur'] ?? '-',

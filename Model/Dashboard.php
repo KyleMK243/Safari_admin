@@ -22,7 +22,7 @@ class Dashboard {
                         b.modele,
                         b.capacite,
                         b.kilometrage,
-                        b.ligne_affectee,
+                        b.trajet_id,
                         b.statut,
                         b.modules,
                         b.derniere_activite,
@@ -41,7 +41,7 @@ class Dashboard {
                             'Non assigné'
                         ) as chauffeur_nom
                     FROM bus b
-                    LEFT JOIN trajets t ON b.ligne_affectee = t.id
+                    LEFT JOIN trajets t ON b.trajet_id = t.id
                     WHERE b.statut IN ('actif', 'maintenance', 'panne')
                     ORDER BY b.numero ASC";
             

@@ -288,14 +288,14 @@ class Billets {
                 COALESCE(COUNT(bil.id), 0) as billets_vendus,
                 (b.capacite - COALESCE(COUNT(bil.id), 0)) as places_disponibles
             FROM bus b
-            INNER JOIN trajets tr ON b.ligne_affectee = tr.id
+            INNER JOIN trajets tr ON b.trajet_id = tr.id
             LEFT JOIN tarifs t ON t.trajet_id = tr.id 
                 AND t.type_tarif = :type_tarif 
                 AND t.statut = 'actif'
             LEFT JOIN billets bil ON bil.bus_id = b.id
                 AND bil.date_voyage = :date_voyage
                 AND bil.statut_billet IN ('reserve', 'paye', 'utilise')
-            WHERE b.ligne_affectee = :trajet_id
+            WHERE b.trajet_id = :trajet_id
                 AND b.statut = 'actif'
                 AND tr.statut = 'actif'
             GROUP BY b.id, b.numero, b.marque, b.modele, b.capacite, b.statut, 

@@ -391,7 +391,7 @@
             <?php if (isset($busList) && count($busList) > 0): ?>
               <?php foreach ($busList as $bus): ?>
                 <option value="<?php echo $bus['id']; ?>" 
-                        data-ligne="<?php echo htmlspecialchars($bus['ligne_affectee'] ?? ''); ?>" 
+                        data-ligne="<?php echo htmlspecialchars($bus['trajet_id'] ?? ''); ?>" 
                         data-immat="<?php echo htmlspecialchars($bus['immatriculation']); ?>">
                   Bus #<?php echo htmlspecialchars($bus['numero']); ?> - <?php echo htmlspecialchars($bus['immatriculation']); ?>
                 </option>
