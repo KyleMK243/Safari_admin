@@ -55,37 +55,37 @@
       </header>
 
       <!-- Stats rapides -->
-      <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px;">
-        <div class="card" style="padding: 16px;">
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="width: 40px; height: 40px; background: #10b981; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-              <i data-feather="truck" style="color: white; width: 20px; height: 20px;"></i>
+      <div class="stats-grid">
+        <div class="card stat-card">
+          <div class="stat-card__content">
+            <div class="stat-card__icon stat-card__icon--success">
+              <i data-feather="truck"></i>
             </div>
-            <div>
-              <div style="font-size: 24px; font-weight: 700; color: #111827;"><?= count(array_filter($buses, fn($b) => $b['statut'] === 'actif')) ?></div>
-              <div style="font-size: 14px; color: #6b7280;">Bus actifs</div>
-            </div>
-          </div>
-        </div>
-        <div class="card" style="padding: 16px;">
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="width: 40px; height: 40px; background: #f59e0b; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-              <i data-feather="tool" style="color: white; width: 20px; height: 20px;"></i>
-            </div>
-            <div>
-              <div style="font-size: 24px; font-weight: 700; color: #111827;"><?= count(array_filter($buses, fn($b) => $b['statut'] === 'maintenance')) ?></div>
-              <div style="font-size: 14px; color: #6b7280;">En maintenance</div>
+            <div class="stat-card__info">
+              <div class="stat-card__value"><?= count(array_filter($buses, fn($b) => $b['statut'] === 'actif')) ?></div>
+              <div class="stat-card__label">Bus actifs</div>
             </div>
           </div>
         </div>
-        <div class="card" style="padding: 16px;">
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="width: 40px; height: 40px; background: #ef4444; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-              <i data-feather="alert-circle" style="color: white; width: 20px; height: 20px;"></i>
+        <div class="card stat-card">
+          <div class="stat-card__content">
+            <div class="stat-card__icon stat-card__icon--warning">
+              <i data-feather="tool"></i>
             </div>
-            <div>
-              <div style="font-size: 24px; font-weight: 700; color: #111827;"><?= count(array_filter($buses, fn($b) => $b['statut'] === 'panne')) ?></div>
-              <div style="font-size: 14px; color: #6b7280;">En panne</div>
+            <div class="stat-card__info">
+              <div class="stat-card__value"><?= count(array_filter($buses, fn($b) => $b['statut'] === 'maintenance')) ?></div>
+              <div class="stat-card__label">En maintenance</div>
+            </div>
+          </div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-card__content">
+            <div class="stat-card__icon stat-card__icon--danger">
+              <i data-feather="alert-circle"></i>
+            </div>
+            <div class="stat-card__info">
+              <div class="stat-card__value"><?= count(array_filter($buses, fn($b) => $b['statut'] === 'panne')) ?></div>
+              <div class="stat-card__label">En panne</div>
             </div>
           </div>
         </div>
@@ -117,8 +117,8 @@
       </section>
 
       <!-- Légende de la carte -->
-      <div class="card" style="padding: 16px; margin-bottom: 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+      <div class="card legend-card">
+        <div class="legend-content">
           <strong style="font-size: 14px; color: #374151;">Légende de la carte :</strong>
           <div style="display: flex; gap: 20px; flex-wrap: wrap; font-size: 13px;">
             <div style="display: flex; align-items: center; gap: 6px;">
@@ -427,6 +427,7 @@
   </div>
 
   <script src="Public/js/app.js"></script>
+  <script src="Public/js/debug-mobile.js"></script>
   
   <script>
     // Données PHP vers JavaScript

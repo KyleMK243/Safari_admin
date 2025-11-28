@@ -46,8 +46,8 @@ class DashboardController {
                 ];
             }
             
-            // Charger la vue
-            require VIEW_PATH . '/index.php';
+            // Charger la vue Dashboard Planification
+            require VIEW_PATH . '/dashboard-pl.php';
         } catch (Exception $e) {
             error_log('Erreur Dashboard: ' . $e->getMessage());
             

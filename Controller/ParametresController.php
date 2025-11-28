@@ -24,28 +24,118 @@ class ParametresController {
     }
 
     /**
-     * Afficher la page des paramètres
+     * Afficher la page des paramètres - Redirection automatique selon département
      */
     public function index() {
+        $departement = $_SESSION['departement'] ?? 'PL';
+        
+        // Rediriger vers la page de paramètres du département
+        switch ($departement) {
+            case 'BT':
+                redirect('/parametres-bt');
+                break;
+            case 'RH':
+                redirect('/parametres-rh');
+                break;
+            case 'BC':
+                redirect('/parametres-bc');
+                break;
+            case 'PL':
+            default:
+                redirect('/parametres-pl');
+                break;
+        }
+    }
+
+    /**
+     * Afficher la page des paramètres - Planification
+     */
+    public function indexPL() {
         try {
             // Récupérer tous les utilisateurs du département PL
-            $utilisateurs = $this->parametresModel->getUtilisateurs();
-            
-            // Récupérer les statistiques
-            $stats = $this->parametresModel->getStatistiquesUtilisateurs();
-            
-            // Récupérer les modules et permissions pour le département PL
-            $modules = $this->permissionModel->getModulesByDepartement('PL');
-            $permissions = $this->permissionModel->getAllPermissionsByDepartement('PL');
-            
-            // Récupérer les paramètres système
-            $parametresSysteme = $this->parametresModel->getParametresSysteme();
+            $utilisateurs = $this->parametresModel->getUtilisateursByDepartement('PL');
             
             // Charger la vue
-            require VIEW_PATH . '/parametres.php';
+            require VIEW_PATH . '/parametres-pl.php';
             
         } catch (Exception $e) {
-            error_log("Erreur parametres index: " . $e->getMessage());
+            error_log("Erreur parametres PL: " . $e->getMessage());
+            $_SESSION['error'] = "Erreur lors du chargement des paramètres";
+            redirect('/dashboard_PL');
+        }
+    }
+
+    /**
+     * Afficher la page des paramètres - Billetterie
+     */
+    public function indexBT() {
+        try {
+            // Récupérer tous les utilisateurs du département BT
+            $utilisateurs = $this->parametresModel->getUtilisateursByDepartement('BT');
+            
+            // Charger la vue
+            require VIEW_PATH . '/parametres-bt.php';
+            
+        } catch (Exception $e) {
+            error_log("Erreur parametres BT: " . $e->getMessage());
+            $_SESSION['error'] = "Erreur lors du chargement des paramètres";
+            redirect('/dashboard_BT');
+        }
+    }
+
+    /**
+     * Afficher la page des paramètres - RH
+     */
+    public function indexRH() {
+        try {
+            // Récupérer tous les utilisateurs du département RH
+            $utilisateurs = $this->parametresModel->getUtilisateursByDepartement('RH');
+            
+            // Charger la vue
+            require VIEW_PATH . '/parametres-rh.php';
+            
+        } catch (Exception $e) {
+            error_log("Erreur parametres RH: " . $e->getMessage());
+            $_SESSION['error'] = "Erreur lors du chargement des paramètres";
+            redirect('/dashboard_RH');
+        }
+    }
+
+    /**
+     * Afficher la page des paramètres - Bureau de conception (BC)
+     */
+    public function indexBC() {
+        try {
+            // Récupérer tous les utilisateurs du département BC
+            $utilisateurs = $this->parametresModel->getUtilisateursByDepartement('BC');
+            
+            // Charger la vue spécifique BC
+            require VIEW_PATH . '/parametres-bc.php';
+            
+        } catch (Exception $e) {
+            error_log("Erreur parametres BC: " . $e->getMessage());
+            $_SESSION['error'] = "Erreur lors du chargement des paramètres";
+            redirect('/dashboard_BC');
+        }
+    }
+
+    /**
+     * Afficher la page des paramètres généraux (Super Admin uniquement)
+     */
+    public function general() {
+        try {
+            // Vérifier que l'utilisateur est super admin
+            if ($_SESSION['role'] !== 'admin') {
+                $_SESSION['error'] = "Accès non autorisé";
+                redirect('/dashboard');
+                exit;
+            }
+            
+            // Charger la vue
+            require VIEW_PATH . '/parametres-general.php';
+            
+        } catch (Exception $e) {
+            error_log("Erreur parametres general: " . $e->getMessage());
             $_SESSION['error'] = "Erreur lors du chargement des paramètres";
             redirect('/dashboard');
         }

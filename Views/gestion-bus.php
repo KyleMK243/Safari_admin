@@ -74,7 +74,6 @@
               <th>Immatriculation</th>
               <th>Ligne affectée</th>
               <th>Statut</th>
-              <th>Chauffeur</th>
               <th>Dernière activité</th>
               <th>Actions</th>
             </tr>
@@ -720,7 +719,6 @@
               ${escapeHtml((bus.statut ?? 'disponible').charAt(0).toUpperCase() + (bus.statut ?? 'disponible').slice(1))}
             </span>
           </td>
-          <td>${escapeHtml(bus.chauffeur ?? '-')}</td>
           <td>${escapeHtml(bus.derniereActivite ?? bus.derniere_activite ?? '-')}</td>
           <td>
             <div class="action-buttons">

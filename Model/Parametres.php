@@ -8,20 +8,28 @@ class Parametres {
     }
 
     /**
-     * Récupérer tous les utilisateurs
+     * Récupérer tous les utilisateurs (ancienne méthode - département PL par défaut)
      */
     public function getUtilisateurs() {
+        return $this->getUtilisateursByDepartement('PL');
+    }
+
+    /**
+     * Récupérer tous les utilisateurs d'un département spécifique
+     * @param string $departement Code du département (PL, BT, RH)
+     */
+    public function getUtilisateursByDepartement($departement) {
         try {
             $sql = "SELECT 
                         id, nom, email, role, statut, 
                         departement, avatar,
                         derniere_connexion, date_creation
                     FROM utilisateurs
-                    WHERE departement = 'PL'
+                    WHERE departement = :departement
                     ORDER BY date_creation DESC";
             
             $stmt = $this->db->prepare($sql);
-            $stmt->execute();
+            $stmt->execute(['departement' => $departement]);
             $utilisateurs = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
             // Adapter les données pour la vue
@@ -39,7 +47,7 @@ class Parametres {
             
             return $utilisateurs;
         } catch (Exception $e) {
-            error_log("Erreur getUtilisateurs: " . $e->getMessage());
+            error_log("Erreur getUtilisateursByDepartement: " . $e->getMessage());
             return [];
         }
     }
@@ -60,21 +68,23 @@ class Parametres {
     }
 
     /**
-     * Créer un nouvel utilisateur (toujours dans le département PL)
+     * Créer un nouvel utilisateur (département basé sur la session, PL par défaut)
      */
     public function creerUtilisateur($nom, $email, $password, $role, $statut = 'actif') {
         try {
             // Générer les initiales pour l'avatar
             $avatar = $this->genererInitiales($nom);
-            
-            // Forcer le département PL pour cette page
+
+            // Département basé sur la session (PL par défaut)
+            $departement = $_SESSION['departement'] ?? 'PL';
+
             $sql = "INSERT INTO utilisateurs (nom, email, mot_de_passe, role, departement, statut, avatar, date_creation) 
-                    VALUES (?, ?, ?, ?, 'PL', ?, ?, NOW())";
+                    VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
             
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
             
             $stmt = $this->db->prepare($sql);
-            $stmt->execute([$nom, $email, $hashedPassword, $role, $statut, $avatar]);
+            $stmt->execute([$nom, $email, $hashedPassword, $role, $departement, $statut, $avatar]);
             
             return [
                 'success' => true,
@@ -90,26 +100,29 @@ class Parametres {
     }
 
     /**
-     * Modifier un utilisateur (département PL uniquement)
+     * Modifier un utilisateur (dans le département courant)
      */
     public function modifierUtilisateur($id, $nom, $email, $role, $statut, $password = null) {
         try {
             // Générer les initiales pour l'avatar
             $avatar = $this->genererInitiales($nom);
+
+            // Département courant (PL par défaut)
+            $departement = $_SESSION['departement'] ?? 'PL';
             
             if ($password) {
                 $sql = "UPDATE utilisateurs 
                         SET nom = ?, email = ?, mot_de_passe = ?, role = ?, statut = ?, avatar = ?
-                        WHERE id = ? AND departement = 'PL'";
+                        WHERE id = ? AND departement = ?";
                 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
                 $stmt = $this->db->prepare($sql);
-                $stmt->execute([$nom, $email, $hashedPassword, $role, $statut, $avatar, $id]);
+                $stmt->execute([$nom, $email, $hashedPassword, $role, $statut, $avatar, $id, $departement]);
             } else {
                 $sql = "UPDATE utilisateurs 
                         SET nom = ?, email = ?, role = ?, statut = ?, avatar = ?
-                        WHERE id = ? AND departement = 'PL'";
+                        WHERE id = ? AND departement = ?";
                 $stmt = $this->db->prepare($sql);
-                $stmt->execute([$nom, $email, $role, $statut, $avatar, $id]);
+                $stmt->execute([$nom, $email, $role, $statut, $avatar, $id, $departement]);
             }
             
             return [

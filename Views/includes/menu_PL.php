@@ -17,25 +17,32 @@
     </div>
 
     <nav class="sidebar__nav">
-        <?php
-        // Charger les modules accessibles selon le rôle
-        require_once ROOT_PATH . '/Model/Permission.php';
-        $permissionModel = new Permission();
-        $modules = $permissionModel->getModulesAccessibles($_SESSION['role'] ?? 'viewer', 'PL');
-        
-        // Afficher les modules autorisés
-        foreach ($modules as $module):
-        ?>
-            <a class="nav__item <?php echo defined('CURRENT_ROUTE') && CURRENT_ROUTE === $module['route'] ? 'active' : ''; ?>" 
-               href="<?php echo BASE_URL; ?>/<?php echo $module['route']; ?>">
-                <i data-feather="<?php echo $module['icone']; ?>"></i> <?php echo e($module['nom']); ?>
-            </a>
-        <?php endforeach; ?>
-        
+        <a class="nav__item <?php echo defined('CURRENT_ROUTE') && CURRENT_ROUTE === 'dashboard_PL' ? 'active' : ''; ?>" 
+           href="<?php echo BASE_URL; ?>/dashboard_PL">
+            <i data-feather="home"></i> Dashboard
+        </a>
+
+        <a class="nav__item <?php echo defined('CURRENT_ROUTE') && CURRENT_ROUTE === 'roulement-pl' ? 'active' : ''; ?>" 
+           href="<?php echo BASE_URL; ?>/roulement-pl">
+            <i data-feather="calendar"></i> Roulement journalier
+        </a>
+
+        <a class="nav__item <?php echo defined('CURRENT_ROUTE') && CURRENT_ROUTE === 'trajets-pl' ? 'active' : ''; ?>" 
+           href="<?php echo BASE_URL; ?>/trajets-pl">
+            <i data-feather="map"></i> Lignes / trajets
+        </a>
+
+        <div class="nav__section">SYSTÈME</div>
+
+        <a class="nav__item <?php echo defined('CURRENT_ROUTE') && (CURRENT_ROUTE === 'parametres' || strpos(CURRENT_ROUTE, 'parametres-pl') === 0) ? 'active' : ''; ?>" 
+           href="<?php echo BASE_URL; ?>/parametres">
+            <i data-feather="settings"></i> Paramètres
+        </a>
+
         <a class="nav__item nav__item--logout" href="<?php echo BASE_URL; ?>/logout">
             <i data-feather="log-out"></i> Déconnexion
         </a>
     </nav>
 
-     <div class="sidebar__footer">© 2024 Dare-Dare</div>
+   <div class="sidebar__footer">© 2024 Pimacle RDC</div>
 </aside>

@@ -20,8 +20,8 @@
       <!-- Header -->
       <header class="header">
         <div>
-          <h1>Paramètres - Planification</h1>
-          <p>Gestion des utilisateurs et permissions du département Planification</p>
+          <h1>Gestion des utilisateurs • Planification</h1>
+          <p>Créer, modifier, activer/désactiver les comptes et gérer leurs permissions</p>
         </div>
       </header>
 
@@ -119,8 +119,16 @@
                       <div class="action-buttons">
                         <button class="btn-icon btn-icon--edit btn-edit-user" 
                           data-id="<?= $user['id'] ?>"
-                          title="Modifier">
+                          data-nom="<?= htmlspecialchars($user['nom']) ?>"
+                          title="Modifier l'utilisateur">
                           <i data-feather="edit-2"></i>
+                        </button>
+                        <button class="btn-icon btn-icon--assign btn-permissions-user"
+                          data-id="<?= $user['id'] ?>"
+                          data-nom="<?= htmlspecialchars($user['nom']) ?>"
+                          data-role="<?= htmlspecialchars($user['role']) ?>"
+                          title="Gérer les permissions">
+                          <i data-feather="shield"></i>
                         </button>
                         <button class="btn-icon btn-icon--<?= $user['statut'] === 'actif' ? 'delete' : 'success' ?> btn-toggle-status" 
                           data-id="<?= $user['id'] ?>"
@@ -557,7 +565,7 @@
           let html = '';
           
           for (const role of roles) {
-            const response = await fetch(`/permissions/get-by-role?role=${role}`);
+            const response = await fetch(`/permissions/get-by-role?role=${role}&departement=PL`);
             const data = await response.json();
             
             console.log(`Données pour ${role}:`, data);

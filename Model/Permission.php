@@ -44,6 +44,53 @@ class Permission {
     }
 
     /**
+     * Obtenir les modules accessibles groupés par section
+     * 
+     * @param string $role Rôle de l'utilisateur
+     * @param string $departement Département (PL, BT, RH)
+     * @return array Modules groupés par section
+     */
+    public function getModulesParSection($role, $departement) {
+        try {
+            $sql = "SELECT m.*, p.peut_voir, p.peut_creer, p.peut_modifier, p.peut_supprimer
+                    FROM modules m
+                    INNER JOIN permissions p ON m.id = p.module_id
+                    WHERE p.role = :role 
+                    AND m.departement = :departement
+                    AND m.actif = TRUE
+                    AND p.peut_voir = TRUE
+                    ORDER BY 
+                        CASE WHEN m.section IS NULL THEN 0 ELSE 1 END,
+                        m.section,
+                        m.ordre ASC";
+            
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                'role' => $role,
+                'departement' => $departement
+            ]);
+            
+            $modules = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // Grouper par section
+            $grouped = [];
+            foreach ($modules as $module) {
+                $section = $module['section'] ?? null;
+                if (!isset($grouped[$section])) {
+                    $grouped[$section] = [];
+                }
+                $grouped[$section][] = $module;
+            }
+            
+            return $grouped;
+            
+        } catch (PDOException $e) {
+            error_log("Erreur récupération modules par section: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
      * Vérifier si un utilisateur peut accéder à une route
      * 
      * @param string $role Rôle de l'utilisateur
@@ -51,6 +98,11 @@ class Permission {
      * @return bool True si accès autorisé
      */
     public function peutAcceder($role, $route) {
+        // L'administrateur a accès à tout par défaut
+        if ($role === 'admin') {
+            return true;
+        }
+
         try {
             $sql = "SELECT COUNT(*) 
                     FROM modules m

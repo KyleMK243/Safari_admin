@@ -44,15 +44,21 @@
 </head>
 <body>
   <div class="app">
-    <?php require_once 'includes/menu_PL.php';  ?>
+    <?php
+      if (isset($menuContext) && $menuContext === 'PL') {
+          require_once 'includes/menu_PL.php';
+      } else {
+          require_once 'includes/menu_BC.php';
+      }
+    ?>
 
     <!-- Main content -->
     <main class="main">
       <!-- Header -->
       <header class="header">
         <div>
-          <h1>Gestion des Trajets</h1>
-          <p>Créer et gérer les trajets, arrêts et points de chifte</p>
+          <h1>Gestion des Lignes/Trajets</h1>
+          <p>Créer et gérer les trajets, arrêts et points de roulement</p>
         </div>
         <div class="header__actions">
           <button class="btn btn--primary" id="btnNouveauTrajet">
@@ -88,7 +94,8 @@
                           <th>Nom du trajet</th>
                           <th>Distance totale</th>
                           <th>Nombre d'arrêts</th>
-                          <th>Points de chifte</th>
+                          <th>Points de changement d'équipe</th>
+                          <th>Bus affectés</th>
                           <th>Statut</th>
                           <th>Actions</th>
                       </tr>
@@ -111,35 +118,186 @@
                                       <?= isset($pointsChifteCount[$trajet['id']]) ? $pointsChifteCount[$trajet['id']] : 0 ?>
                                   </td>
                                   <td>
-                                      <span class="status-badge <?= $trajet['statut'] === 'actif' ? 'status--active' : 'status--inactive' ?>">
+                                      <strong><?= isset($busCount[$trajet['id']]) ? $busCount[$trajet['id']] : 0 ?></strong> bus
+                                  </td>
+                                  <td>
+                                      <span class="badge <?= $trajet['statut'] === 'actif' ? 'badge--green' : 'badge--danger' ?>">
                                           <?= ucfirst($trajet['statut']) ?>
                                       </span>
                                   </td>
                                   <td>
                                       <div class="action-buttons">
                                           <button class="btn-icon btn-icon--edit" 
-                                                  onclick="voirTrajet(<?= $trajet['id'] ?>)" 
+                                                  onclick="voirTrajet(<?= (int)$trajet['id'] ?>)" 
                                                   title="Voir le trajet">
                                               <i data-feather="eye"></i>
                                           </button>
                                           <button class="btn-icon btn-icon--assign" 
-                                                  onclick="modifierTrajet(<?= $trajet['id'] ?>)" 
+                                                  onclick="modifierTrajet(<?= (int)$trajet['id'] ?>)" 
                                                   title="Modifier">
                                               <i data-feather="edit-2"></i>
                                           </button>
                                           <button class="btn-icon btn-icon--delete" 
-                                                  onclick="supprimerTrajet(<?= $trajet['id'] ?>)" 
-                                                  title="Supprimer">
-                                              <i data-feather="trash-2"></i>
+                                                  onclick="changerStatutTrajet(<?= (int)$trajet['id'] ?>, '<?= $trajet['statut'] === 'actif' ? 'actif' : 'inactif' ?>')" 
+                                                  title="<?= $trajet['statut'] === 'actif' ? 'Désactiver le trajet' : 'Activer le trajet' ?>">
+                                              <i data-feather="power"></i>
                                           </button>
                                       </div>
                                   </td>
                               </tr>
                           <?php endforeach; ?>
                       <?php else: ?>
-                          <tr>
-                              <td colspan="7" class="text-center">Aucun trajet disponible</td>
-                          </tr>
+                          <?php
+                          // Données de maquette : 10 trajets de test pour le Bureau de conception
+                          $trajetsDemo = [
+                              [
+                                  'code' => 'L101',
+                                  'nom' => 'Gare centrale - Rond-point Victoire',
+                                  'distance_totale' => 12.5,
+                                  'nb_arrets' => 6,
+                                  'nb_points_shift' => 2,
+                                  'nb_bus' => 3,
+                                  'statut' => 'actif',
+                                  'couleur' => '#3b82f6',
+                              ],
+                              [
+                                  'code' => 'L102',
+                                  'nom' => 'Victoire - UP Campus',
+                                  'distance_totale' => 9.8,
+                                  'nb_arrets' => 5,
+                                  'nb_points_shift' => 2,
+                                  'nb_bus' => 2,
+                                  'statut' => 'actif',
+                                  'couleur' => '#10b981',
+                              ],
+                              [
+                                  'code' => 'L103',
+                                  'nom' => 'UP Campus - Ndjili Aéroport',
+                                  'distance_totale' => 18.3,
+                                  'nb_arrets' => 8,
+                                  'nb_points_shift' => 3,
+                                  'nb_bus' => 4,
+                                  'statut' => 'inactif',
+                                  'couleur' => '#f59e0b',
+                              ],
+                              [
+                                  'code' => 'L104',
+                                  'nom' => 'Masina - Kikimi',
+                                  'distance_totale' => 15.0,
+                                  'nb_arrets' => 7,
+                                  'nb_points_shift' => 2,
+                                  'nb_bus' => 3,
+                                  'statut' => 'actif',
+                                  'couleur' => '#8b5cf6',
+                              ],
+                              [
+                                  'code' => 'L105',
+                                  'nom' => 'Limete - Kingabwa',
+                                  'distance_totale' => 7.2,
+                                  'nb_arrets' => 4,
+                                  'nb_points_shift' => 1,
+                                  'nb_bus' => 2,
+                                  'statut' => 'actif',
+                                  'couleur' => '#ec4899',
+                              ],
+                              [
+                                  'code' => 'L106',
+                                  'nom' => 'Kintambo Magasin - Ma Campagne',
+                                  'distance_totale' => 10.4,
+                                  'nb_arrets' => 5,
+                                  'nb_points_shift' => 2,
+                                  'nb_bus' => 3,
+                                  'statut' => 'inactif',
+                                  'couleur' => '#06b6d4',
+                              ],
+                              [
+                                  'code' => 'L107',
+                                  'nom' => 'Binza Delvaux - UPN',
+                                  'distance_totale' => 13.7,
+                                  'nb_arrets' => 6,
+                                  'nb_points_shift' => 2,
+                                  'nb_bus' => 4,
+                                  'statut' => 'actif',
+                                  'couleur' => '#14b8a6',
+                              ],
+                              [
+                                  'code' => 'L108',
+                                  'nom' => 'UPN - Selembao',
+                                  'distance_totale' => 11.1,
+                                  'nb_arrets' => 5,
+                                  'nb_points_shift' => 2,
+                                  'nb_bus' => 2,
+                                  'statut' => 'actif',
+                                  'couleur' => '#f97316',
+                              ],
+                              [
+                                  'code' => 'L109',
+                                  'nom' => 'Pompage - Matadi Kibala',
+                                  'distance_totale' => 8.9,
+                                  'nb_arrets' => 4,
+                                  'nb_points_shift' => 1,
+                                  'nb_bus' => 2,
+                                  'statut' => 'inactif',
+                                  'couleur' => '#a855f7',
+                              ],
+                              [
+                                  'code' => 'L110',
+                                  'nom' => 'Gombe - Boulevard du 30 Juin',
+                                  'distance_totale' => 6.3,
+                                  'nb_arrets' => 3,
+                                  'nb_points_shift' => 1,
+                                  'nb_bus' => 3,
+                                  'statut' => 'actif',
+                                  'couleur' => '#ef4444',
+                              ],
+                          ];
+                          ?>
+
+                          <?php foreach ($trajetsDemo as $demoIndex => $trajetDemo) : ?>
+                              <tr class="trajet-demo-row"
+                                  data-code="<?= htmlspecialchars($trajetDemo['code']) ?>"
+                                  data-nom="<?= htmlspecialchars($trajetDemo['nom']) ?>"
+                                  data-distance="<?= htmlspecialchars($trajetDemo['distance_totale']) ?>"
+                                  data-statut="<?= htmlspecialchars($trajetDemo['statut']) ?>"
+                                  data-arrets="<?= (int)$trajetDemo['nb_arrets'] ?>"
+                                  data-points-shift="<?= (int)$trajetDemo['nb_points_shift'] ?>"
+                                  data-bus="<?= (int)$trajetDemo['nb_bus'] ?>">
+                                  <td>
+                                      <span style="background: <?= htmlspecialchars($trajetDemo['couleur']) ?>; color: white; padding: 4px 8px; border-radius: 4px; font-weight: 700; font-size: 12px;">
+                                          <?= htmlspecialchars($trajetDemo['code']) ?>
+                                      </span>
+                                  </td>
+                                  <td><?= htmlspecialchars($trajetDemo['nom']) ?></td>
+                                  <td><?= htmlspecialchars($trajetDemo['distance_totale']) ?> km</td>
+                                  <td><?= (int)$trajetDemo['nb_arrets'] ?></td>
+                                  <td><?= (int)$trajetDemo['nb_points_shift'] ?></td>
+                                  <td><strong><?= (int)$trajetDemo['nb_bus'] ?></strong> bus</td>
+                                  <td>
+                                      <span class="badge <?= $trajetDemo['statut'] === 'actif' ? 'badge--green' : 'badge--danger' ?>">
+                                          <?= ucfirst($trajetDemo['statut']) ?>
+                                      </span>
+                                  </td>
+                                  <td>
+                                      <div class="action-buttons">
+                                          <button type="button" class="btn-icon btn-icon--edit" 
+                                                  onclick="voirTrajetDemo('<?= htmlspecialchars($trajetDemo['code']) ?>')" 
+                                                  title="Voir le trajet (maquette)">
+                                              <i data-feather="eye"></i>
+                                          </button>
+                                          <button type="button" class="btn-icon btn-icon--assign" 
+                                                  onclick="modifierTrajetDemo('<?= htmlspecialchars($trajetDemo['code']) ?>')" 
+                                                  title="Modifier le trajet (maquette)">
+                                              <i data-feather="edit-2"></i>
+                                          </button>
+                                          <button type="button" class="btn-icon btn-icon--delete" 
+                                                  onclick="changerStatutTrajetDemo('<?= htmlspecialchars($trajetDemo['code']) ?>')" 
+                                                  title="Activer / désactiver (maquette)">
+                                              <i data-feather="power"></i>
+                                          </button>
+                                      </div>
+                                  </td>
+                              </tr>
+                          <?php endforeach; ?>
                       <?php endif; ?>
                   </tbody>
               </table>
@@ -218,6 +376,13 @@
             <!-- Points de chifte générés par JS -->
           </div>
         </div>
+
+        <div class="profil-section">
+          <h3 class="profil-section__title">Bus affectés à ce trajet</h3>
+          <div id="detailsBusAffectes">
+            <!-- Bus affectés générés par JS -->
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -262,7 +427,12 @@
         <div id="step1" class="trajet-step">
           <h3 style="margin-bottom: 20px; color: #1B4B7F; display: flex; align-items: center; gap: 8px;"><i data-feather="map-pin" style="width: 20px; height: 20px;"></i> Informations de base et coordonnées</h3>
           
-          <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+          <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+            <div class="form-group">
+              <label for="trajetCode">Code du trajet *</label>
+              <input type="text" id="trajetCode" name="trajetCode" required placeholder="Ex: L21" class="form-control">
+            </div>
+
             <div class="form-group">
               <label for="trajetNom">Nom du trajet *</label>
               <input type="text" id="trajetNom" name="trajetNom" required placeholder="Ex: Kinshasa → Matadi" class="form-control">
@@ -396,6 +566,235 @@
     let currentTrajetId = null;
     let isEditMode = false;
 
+    // ======== FONCTIONS MAQUETTE POUR LES TRAJETS DEMO (L101...L110) ========
+    function getTrajetDemoByCode(code) {
+      if (!code) return null;
+      const row = document.querySelector(`tr.trajet-demo-row[data-code="${code}"]`);
+      if (!row) return null;
+      return {
+        code: row.getAttribute('data-code'),
+        nom: row.getAttribute('data-nom'),
+        distance: row.getAttribute('data-distance'),
+        statut: row.getAttribute('data-statut'),
+        nbArrets: row.getAttribute('data-arrets'),
+        nbPointsShift: row.getAttribute('data-points-shift'),
+        nbBus: row.getAttribute('data-bus')
+      };
+    }
+
+    // Voir les détails d'un trajet de maquette dans le même modal que les vrais trajets
+    function voirTrajetDemo(code) {
+      const trajet = getTrajetDemoByCode(code);
+      if (!trajet) return;
+
+      const modal = document.getElementById('modalDetailsTrajet');
+      if (!modal) return;
+
+      modal.classList.add('active');
+      document.getElementById('detailsTrajetTitle').textContent = 'Détails du Trajet - ' + trajet.nom + ' (maquette)';
+      document.getElementById('detailsNom').textContent = trajet.nom;
+      document.getElementById('detailsDistance').textContent = trajet.distance + ' km';
+      document.getElementById('detailsStatut').innerHTML = `<span class="status-badge ${trajet.statut === 'actif' ? 'status--active' : 'status--inactive'}">${trajet.statut.charAt(0).toUpperCase() + trajet.statut.slice(1)} (maquette)</span>`;
+
+      // Arrêts de démo
+      const arretsContainer = document.getElementById('detailsArrets');
+      const nbArrets = parseInt(trajet.nbArrets || '0', 10);
+      if (nbArrets > 0) {
+        const items = [];
+        for (let i = 1; i <= nbArrets; i++) {
+          items.push(`
+            <div style="padding: 10px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between;">
+              <div>
+                <strong>${i}.</strong> Arrêt démo ${i}
+              </div>
+              <small style="color: #6b7280;">${(i * 2).toFixed(1)} km</small>
+            </div>
+          `);
+        }
+        arretsContainer.innerHTML = items.join('');
+      } else {
+        arretsContainer.innerHTML = '<p style="color: #9ca3af; padding: 12px; background: #f9fafb; border-radius: 6px;">Aucun arrêt défini (maquette)</p>';
+      }
+
+      // Points de roulement / shifts de démo
+      const chiftesContainer = document.getElementById('detailsChiftes');
+      const nbPoints = parseInt(trajet.nbPointsShift || '0', 10);
+      if (nbPoints > 0) {
+        const items = [];
+        for (let i = 1; i <= nbPoints; i++) {
+          items.push(`
+            <div style="padding: 10px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between;">
+              <div>
+                <strong>${i}.</strong> Point de roulement démo ${i}
+              </div>
+              <small style="color: #6b7280;">${(i * 3).toFixed(1)} km</small>
+            </div>
+          `);
+        }
+        chiftesContainer.innerHTML = items.join('');
+      } else {
+        chiftesContainer.innerHTML = '<p style="color: #9ca3af; padding: 12px; background: #f9fafb; border-radius: 6px;">Aucun point de roulement (maquette)</p>';
+      }
+
+      // Bus affectés de démo
+      const busContainer = document.getElementById('detailsBusAffectes');
+      const nbBus = parseInt(trajet.nbBus || '0', 10);
+      if (nbBus > 0) {
+        const items = [];
+        for (let i = 1; i <= nbBus; i++) {
+          items.push(`
+            <div style="padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; background: #f9fafb;">
+              <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">
+                #D${i}
+              </div>
+              <div style="flex: 1;">
+                <div style="font-weight: 600; color: var(--text);">Bus démo #D${i}</div>
+                <div style="font-size: 13px; color: var(--muted);">CD-DEMO-${i.toString().padStart(3, '0')}</div>
+              </div>
+              <span class="status-badge status--active">Actif</span>
+            </div>
+          `);
+        }
+        busContainer.innerHTML = items.join('');
+      } else {
+        busContainer.innerHTML = '<p style="color: #9ca3af; padding: 12px; background: #f9fafb; border-radius: 6px;">Aucun bus affecté (maquette)</p>';
+      }
+
+      if (typeof feather !== 'undefined') {
+        setTimeout(() => feather.replace(), 10);
+      }
+    }
+
+    // Modifier un trajet de maquette en pré-remplissant le grand modal
+    function modifierTrajetDemo(code) {
+      const trajet = getTrajetDemoByCode(code);
+      if (!trajet) return;
+
+      const modal = document.getElementById('modalTrajet');
+      if (!modal) return;
+
+      isEditMode = true;
+      currentTrajetId = null; // maquette, pas d'ID réel
+
+      document.getElementById('modalTrajetTitle').textContent = 'Modifier le Trajet (maquette)';
+      const codeInput = document.getElementById('trajetCode');
+      if (codeInput) {
+        codeInput.value = trajet.code || '';
+        codeInput.readOnly = true;
+      }
+      document.getElementById('trajetNom').value = trajet.nom;
+      document.getElementById('trajetStatut').value = trajet.statut;
+      document.getElementById('trajetCouleur').value = '#3b82f6';
+      document.getElementById('trajetCouleurHex').value = '#3b82f6';
+
+      // Réinitialiser les autres champs de coordonnées / arrêts / shifts
+      document.getElementById('latDepart').value = '';
+      document.getElementById('lonDepart').value = '';
+      document.getElementById('latArrivee').value = '';
+      document.getElementById('lonArrivee').value = '';
+      document.getElementById('arretsContainer').innerHTML = '';
+      document.getElementById('shiftsContainer').innerHTML = '';
+
+      // Afficher l'étape 1
+      if (typeof afficherEtape === 'function') {
+        afficherEtape(1);
+      }
+
+      modal.classList.add('active');
+      if (typeof feather !== 'undefined') {
+        setTimeout(() => feather.replace(), 10);
+      }
+    }
+
+    // Changer le statut dans une ligne de maquette (visuel uniquement)
+    function changerStatutTrajetDemo(code) {
+      const row = document.querySelector(`tr.trajet-demo-row[data-code="${code}"]`);
+      if (!row) return;
+
+      const statutActuel = row.getAttribute('data-statut') || 'actif';
+      const nouveauStatut = statutActuel === 'actif' ? 'inactif' : 'actif';
+
+      row.setAttribute('data-statut', nouveauStatut);
+
+      const badge = row.querySelector('.badge');
+      if (badge) {
+        badge.textContent = nouveauStatut.charAt(0).toUpperCase() + nouveauStatut.slice(1);
+        badge.classList.remove('badge--green', 'badge--danger');
+        badge.classList.add(nouveauStatut === 'actif' ? 'badge--green' : 'badge--danger');
+      }
+
+      const btnPower = row.querySelector('.btn-icon.btn-icon--delete');
+      if (btnPower) {
+        btnPower.title = nouveauStatut === 'actif' ? 'Activer / désactiver (maquette)' : 'Activer / désactiver (maquette)';
+      }
+
+      if (typeof feather !== 'undefined') {
+        feather.replace();
+      }
+    }
+
+    // Changer le statut d'un trajet (actif <-> inactif) depuis le tableau
+    async function changerStatutTrajet(trajetId, statutActuel) {
+      if (!trajetId) return;
+
+      const confirmationMessage = statutActuel === 'actif'
+        ? "Voulez-vous désactiver ce trajet ?"
+        : "Voulez-vous activer ce trajet ?";
+
+      if (!confirm(confirmationMessage)) {
+        return;
+      }
+
+      try {
+        const response = await fetch('trajets/toggle-statut', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ id: trajetId })
+        });
+
+        const data = await response.json();
+        if (!data.success) {
+          alert(data.message || 'Erreur lors du changement de statut');
+          return;
+        }
+
+        const nouveauStatut = data.statut || (statutActuel === 'actif' ? 'inactif' : 'actif');
+
+        // Mettre à jour le badge statut et le bouton dans la ligne du tableau
+        const btnSelector = `button[onclick=\"changerStatutTrajet(${trajetId}, '${statutActuel}')\"]`;
+        let btnPower = document.querySelector(btnSelector);
+        if (!btnPower) {
+          // Fallback: chercher simplement par id
+          btnPower = document.querySelector(`button[onclick^=\"changerStatutTrajet(${trajetId},\"]`);
+        }
+
+        const ligne = btnPower ? btnPower.closest('tr') : null;
+        if (ligne) {
+          const badgeStatut = ligne.querySelector('.badge');
+          if (badgeStatut) {
+            badgeStatut.textContent = nouveauStatut.charAt(0).toUpperCase() + nouveauStatut.slice(1);
+            badgeStatut.classList.remove('badge--green', 'badge--danger');
+            badgeStatut.classList.add(nouveauStatut === 'actif' ? 'badge--green' : 'badge--danger');
+          }
+
+          if (btnPower) {
+            btnPower.title = nouveauStatut === 'actif' ? 'Désactiver le trajet' : 'Activer le trajet';
+            btnPower.setAttribute('onclick', `changerStatutTrajet(${trajetId}, '${nouveauStatut}')`);
+          }
+        }
+
+        if (typeof feather !== 'undefined') {
+          feather.replace();
+        }
+
+      } catch (error) {
+        console.error('Erreur toggle statut trajet:', error);
+        alert('Erreur lors du changement de statut');
+      }
+    }
+
     // Fonction pour voir un trajet (modal détails) - AJAX
     function voirTrajet(trajetId) {
       // Afficher le modal avec loader
@@ -447,6 +846,27 @@
               chiftesContainer.innerHTML = '<p style="color: #9ca3af; padding: 12px; background: #f9fafb; border-radius: 6px;">Aucun point de chifte défini</p>';
             }
             
+            // Afficher les bus affectés
+            const busContainer = document.getElementById('detailsBusAffectes');
+            if (data.bus && data.bus.length > 0) {
+              busContainer.innerHTML = data.bus.map((bus, index) => `
+                <div style="padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; background: #f9fafb;">
+                  <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">
+                    #${bus.numero}
+                  </div>
+                  <div style="flex: 1;">
+                    <div style="font-weight: 600; color: var(--text);">Bus #${bus.numero}</div>
+                    <div style="font-size: 13px; color: var(--muted);">${bus.immatriculation}</div>
+                  </div>
+                  <span class="status-badge status-badge--${bus.statut}">
+                    ${bus.statut.charAt(0).toUpperCase() + bus.statut.slice(1)}
+                  </span>
+                </div>
+              `).join('');
+            } else {
+              busContainer.innerHTML = '<p style="color: #9ca3af; padding: 12px; background: #f9fafb; border-radius: 6px;">Aucun bus affecté à ce trajet</p>';
+            }
+            
             setTimeout(() => feather.replace(), 10);
           } else {
             alert('Erreur : ' + data.message);
@@ -482,6 +902,11 @@
             // Remplir l'étape 1 : Informations de base
             document.getElementById('modalTrajetTitle').textContent = 'Modifier le Trajet';
             document.getElementById('trajetId').value = trajet.id;
+            const codeInput = document.getElementById('trajetCode');
+            if (codeInput) {
+              codeInput.value = trajet.code || '';
+              codeInput.readOnly = true;
+            }
             document.getElementById('trajetNom').value = trajet.nom;
             document.getElementById('trajetStatut').value = trajet.statut;
             
@@ -1209,6 +1634,7 @@
       // Collecter toutes les données
       const trajetData = {
         id: document.getElementById('trajetId').value,
+        code: document.getElementById('trajetCode').value,
         nom: document.getElementById('trajetNom').value,
         statut: document.getElementById('trajetStatut').value,
         couleur: document.getElementById('trajetCouleurHex').value || '#3b82f6',

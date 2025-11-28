@@ -19,29 +19,22 @@ class ShiftsController {
      */
     public function index() {
         try {
-            // Récupérer les filtres depuis l'URL
+            // Récupérer les filtres depuis l'URL (statut + date uniquement pour le roulement journalier)
             $filtreStatut = isset($_GET['statut']) && $_GET['statut'] !== '' ? $_GET['statut'] : null;
             $filtreDate = isset($_GET['date']) && $_GET['date'] !== '' ? $_GET['date'] : null;
-            $filtreBus = isset($_GET['bus']) && $_GET['bus'] !== '' ? $_GET['bus'] : null;
 
             // Debug
-            error_log("=== FILTRES SHIFTS ===");
+            error_log("=== FILTRES ROULEMENT JOURNALIER ===");
             error_log("Statut: " . ($filtreStatut ?? 'null'));
             error_log("Date: " . ($filtreDate ?? 'null'));
-            error_log("Bus: " . ($filtreBus ?? 'null'));
 
-            // Récupérer les shifts avec filtres
-            $shifts = $this->shiftsModel->getShiftsAvecFiltres($filtreStatut, $filtreDate, $filtreBus, 100, 0);
+            // Récupérer les shifts avec filtres (sans filtre bus)
+            $shifts = $this->shiftsModel->getShiftsAvecFiltres($filtreStatut, $filtreDate, null, 100, 0);
 
             error_log("Nombre de shifts trouvés: " . count($shifts));
 
-            // Récupérer la liste des bus pour le filtre
-            require_once ROOT_PATH . '/Model/Bus.php';
-            $busModel = new Bus();
-            $busList = $busModel->getBusAvecPagination(1000, 0);
-
-            // Charger la vue
-            $pageTitle = 'Historique des Shifts';
+            // Charger la vue roulement journalier PL
+            $pageTitle = 'Roulement journalier';
             require_once ROOT_PATH . '/Views/shifts.php';
 
         } catch (Exception $e) {

@@ -7,6 +7,16 @@ class Trajets {
         $this->db = Database::getInstance()->getConnection();
     }
 
+    // Changer uniquement le statut d'un trajet (actif / inactif)
+    public function changerStatutTrajet($id, $statut) {
+        $sql = "UPDATE trajets SET statut = :statut WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            'statut' => $statut,
+            'id' => $id
+        ]);
+    }
+
     // ===============================
     // TRAJETS
     // ===============================
@@ -70,8 +80,12 @@ class Trajets {
         try {
             $this->db->beginTransaction();
             
-            // Générer le code du trajet (L1, L2, L3, etc.)
-            $code = $this->genererCodeTrajet();
+            // Utiliser le code fourni ou générer le code du trajet (L1, L2, L3, etc.)
+            if (!empty($data['code'])) {
+                $code = trim($data['code']);
+            } else {
+                $code = $this->genererCodeTrajet();
+            }
             
             // Insérer le trajet
             $sql = "
@@ -366,6 +380,23 @@ class Trajets {
             'distance_avec_debut' => $data['distance_avec_debut'] ?? 0,
             'temp_parcour' => $data['temp_parcour'] ?? 0
         ]);
+    }
+
+    // ===============================
+    // BUS AFFECTÉS
+    // ===============================
+
+    // Récupérer les bus affectés à un trajet
+    public function getBusByTrajet($trajetId) {
+        $stmt = $this->db->prepare("
+            SELECT b.id, b.numero, b.immatriculation, b.statut, b.marque, b.modele
+            FROM bus b
+            WHERE b.trajet_id = :trajet_id
+            ORDER BY b.numero ASC
+        ");
+        $stmt->bindValue(':trajet_id', $trajetId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     // Générer un code unique pour le trajet (L1, L2, L3, etc.)

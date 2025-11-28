@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="shortcut icon" href="Public/img/icons/safari-icone1.jpeg" />
-  <title>Gestion des Shifts • Safari</title>
+  <title>Roulement journalier • Safari</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -20,11 +20,11 @@
       <!-- Header -->
       <header class="header">
         <div>
-          <h1>Historique des Shifts</h1>
-          <p>Consulter l'historique et obtenir des suggestions</p>
+          <h1>Roulement journalier</h1>
         </div>
         <div class="header__actions">
-          <button class="btn btn--primary" id="btnSuggererShifts">
+          <button class="btn btn--primary" id="btnSuggererShifts"
+                  onclick="var m=document.getElementById('modalSuggestions');if(m){m.classList.add('active');if(window.feather){feather.replace();}}">
             <i data-feather="zap"></i> Voir les suggestions
           </button>
         </div>
@@ -36,129 +36,169 @@
           <i data-feather="filter"></i>
           Filtres
         </div>
-        <form method="GET" action="<?php echo BASE_URL; ?>/shifts" class="filters__controls">
+        <form method="GET" action="<?php echo BASE_URL; ?>/roulement-pl" class="filters__controls">
           <select name="statut" id="filterStatut">
             <option value="">Tous les statuts</option>
-            <option value="planifie" <?php echo (isset($_GET['statut']) && $_GET['statut'] == 'planifie') ? 'selected' : ''; ?>>Planifié</option>
-            <option value="actif" <?php echo (isset($_GET['statut']) && $_GET['statut'] == 'actif') ? 'selected' : ''; ?>>Actif</option>
+            <option value="planifie" <?php echo (isset($_GET['statut']) && $_GET['statut'] == 'planifie') ? 'selected' : ''; ?>>À confirmer</option>
+            <option value="actif" <?php echo (isset($_GET['statut']) && $_GET['statut'] == 'actif') ? 'selected' : ''; ?>>Confirmé</option>
+            <option value="annule" <?php echo (isset($_GET['statut']) && $_GET['statut'] == 'annule') ? 'selected' : ''; ?>>Révoqué</option>
             <option value="termine" <?php echo (isset($_GET['statut']) && $_GET['statut'] == 'termine') ? 'selected' : ''; ?>>Terminé</option>
-            <option value="annule" <?php echo (isset($_GET['statut']) && $_GET['statut'] == 'annule') ? 'selected' : ''; ?>>Annulé</option>
           </select>
           <input type="date" name="date" id="filterDate" value="<?php echo isset($_GET['date']) ? htmlspecialchars($_GET['date']) : ''; ?>">
-          <select name="bus" id="filterBus">
-            <option value="">Tous les bus</option>
-            <?php if (isset($busList) && is_array($busList)): ?>
-              <?php foreach ($busList as $bus): ?>
-                <option value="<?php echo htmlspecialchars($bus['numero']); ?>" 
-                  <?php echo (isset($_GET['bus']) && $_GET['bus'] == $bus['numero']) ? 'selected' : ''; ?>>
-                  Bus #<?php echo htmlspecialchars($bus['numero']); ?> - <?php echo htmlspecialchars($bus['immatriculation']); ?>
-                </option>
-              <?php endforeach; ?>
-            <?php endif; ?>
-          </select>
           <button type="submit" class="btn btn--primary" id="btnFiltrer">Filtrer</button>
-          <?php if (isset($_GET['statut']) || isset($_GET['date']) || isset($_GET['bus'])): ?>
-            <a href="<?php echo BASE_URL; ?>/shifts" class="btn btn--secondary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Réinitialiser</a>
+          <?php if (isset($_GET['statut']) || isset($_GET['date'])): ?>
+            <a href="<?php echo BASE_URL; ?>/roulement-pl" class="btn btn--secondary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Réinitialiser</a>
           <?php endif; ?>
         </form>
       </section>
 
-      <!-- Shifts Table -->
+      <!-- Shifts Table / Roulement journalier -->
       <section class="bus-table card">
+        <div class="card__header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+          <div>
+            <h2>Roulement du jour</h2>
+            <p style="font-size:13px;color:#6b7280;">Sélectionner les agents à confirmer, révoquer ou réaffecter.</p>
+          </div>
+          <div class="header__actions" style="display:flex;flex-wrap:wrap;gap:8px;">
+            <button type="button" class="btn btn--primary" id="btnConfirmerSelection">Confirmer sélection</button>
+            <button type="button" class="btn btn--secondary" id="btnRevoquerSelection">Révoquer sélection</button>
+            <button type="button" class="btn btn--secondary" id="btnReaffecterSelection">Réaffecter sélection</button>
+            <button type="button" class="btn btn--secondary" id="btnNotifierSelection">Notifier sélection</button>
+            <button type="button" class="btn btn--secondary" id="btnImprimerSelection">Imprimer</button>
+          </div>
+        </div>
+
         <table class="table" style="white-space: nowrap;">
           <thead>
             <tr>
-              <th>Date</th>
-              <th>Horaire</th>
-              <th>Bus</th>
-              <th>Chauffeur</th>
-              <th>Contrôleur</th>
-              <th>Receveur</th>
+              <th style="width:32px;">
+                <input type="checkbox" id="selectAllRoulements" />
+              </th>
+              <th>N°</th>
+              <th>Matricule agent</th>
+              <th>Nom de l'agent</th>
+              <th>Date &amp; jour</th>
               <th>Statut</th>
-              <th style="width: 180px;">Actions</th>
+              <th style="width: 210px;">Actions</th>
             </tr>
           </thead>
           <tbody>
-            <?php if (isset($shifts) && count($shifts) > 0): ?>
-              <?php foreach ($shifts as $shift): ?>
+            <?php
+              // Préparer les données de roulement à afficher
+              $roulements = isset($shifts) && is_array($shifts) ? $shifts : [];
+
+              // Si aucun shift réel, injecter 10 données de test (maquette)
+              if (count($roulements) === 0) {
+                $aujourdhui = date('Y-m-d');
+                $roulements = [
+                  ['id' => 1,  'date_prevue' => $aujourdhui, 'statut' => 'planifie', 'controleur_nom' => 'Jean-Pierre Mukendi'],
+                  ['id' => 2,  'date_prevue' => $aujourdhui, 'statut' => 'planifie', 'controleur_nom' => 'Marie Tshala'],
+                  ['id' => 3,  'date_prevue' => $aujourdhui, 'statut' => 'actif',    'controleur_nom' => 'Patrick Kabongo'],
+                  ['id' => 4,  'date_prevue' => $aujourdhui, 'statut' => 'annule',   'controleur_nom' => 'Chantal Ilunga'],
+                  ['id' => 5,  'date_prevue' => $aujourdhui, 'statut' => 'planifie', 'controleur_nom' => 'Serge Kanku'],
+                  ['id' => 6,  'date_prevue' => $aujourdhui, 'statut' => 'actif',    'controleur_nom' => 'Esther Mbuyi'],
+                  ['id' => 7,  'date_prevue' => $aujourdhui, 'statut' => 'planifie', 'controleur_nom' => 'Eric Kabasele'],
+                  ['id' => 8,  'date_prevue' => $aujourdhui, 'statut' => 'annule',   'controleur_nom' => 'Nadine Kasongo'],
+                  ['id' => 9,  'date_prevue' => $aujourdhui, 'statut' => 'termine',  'controleur_nom' => 'Christian Tshimanga'],
+                  ['id' => 10, 'date_prevue' => $aujourdhui, 'statut' => 'planifie', 'controleur_nom' => 'Aline Mbala'],
+                ];
+              }
+            ?>
+            <?php if (count($roulements) > 0): ?>
+              <?php foreach ($roulements as $index => $shift): ?>
+                <?php
+                  // Détermination de l'agent principal (contrôleur en priorité)
+                  $agentNom = '-';
+                  if (!empty($shift['controleur_nom'])) {
+                    $agentNom = $shift['controleur_nom'];
+                  } elseif (!empty($shift['chauffeur_nom'])) {
+                    $agentNom = $shift['chauffeur_nom'];
+                  } elseif (!empty($shift['receveur_nom'])) {
+                    $agentNom = $shift['receveur_nom'];
+                  }
+
+                  // Matricule maquette basé sur l'ID du shift
+                  $agentMatricule = 'AG-' . str_pad($shift['id'], 6, '0', STR_PAD_LEFT);
+
+                  // Date + jour de la semaine
+                  $dateObj = !empty($shift['date_prevue']) ? new DateTime($shift['date_prevue']) : null;
+                  $libelleJour = '';
+                  if ($dateObj) {
+                    $joursSemaine = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+                    $libelleJour = $joursSemaine[(int) $dateObj->format('w')];
+                  }
+
+                  // Statut visuel
+                  $statutClass = '';
+                  $statutLabel = '';
+                  switch ($shift['statut']) {
+                    case 'planifie':
+                      $statutClass = 'status-badge--actif';
+                      $statutLabel = 'À confirmer';
+                      break;
+                    case 'actif':
+                      $statutClass = 'status-badge--maintenance';
+                      $statutLabel = 'Confirmé';
+                      break;
+                    case 'termine':
+                      $statutClass = 'status-badge--inactif';
+                      $statutLabel = 'Terminé';
+                      break;
+                    case 'annule':
+                      $statutClass = 'status-badge--panne';
+                      $statutLabel = 'Révoqué';
+                      break;
+                    default:
+                      $statutClass = '';
+                      $statutLabel = $shift['statut'];
+                  }
+                ?>
                 <tr>
                   <td>
-                    <strong><?php echo date('d/m/Y', strtotime($shift['date_prevue'])); ?></strong>
+                    <input type="checkbox" class="select-roulement" data-shift-id="<?php echo (int) $shift['id']; ?>" />
                   </td>
-                  <td><?php echo substr($shift['heure_debut'], 0, 5); ?> - <?php echo substr($shift['heure_fin'], 0, 5); ?></td>
-                  <td>
-                    <div class="bus-info">
-                      <strong>Bus #<?php echo htmlspecialchars($shift['bus_numero']); ?></strong>
-                      <small><?php echo htmlspecialchars($shift['bus_immatriculation'] ?? '-'); ?></small>
-                    </div>
+                  <td><?php echo $index + 1; ?></td>
+                  <td><?php echo htmlspecialchars($agentMatricule); ?></td>
+                  <td><?php echo htmlspecialchars($agentNom); ?></td>
+                  <td class="cell-roulement-jour" data-shift-id="<?php echo (int) $shift['id']; ?>" style="cursor:pointer;"
+                      onclick="window._celluleRoulementActive=this;var m=document.getElementById('modalChoixRoulementPL');if(m){m.classList.add('active');if(window.feather){feather.replace();}}">
+                    <?php if ($dateObj): ?>
+                      <strong><?php echo $dateObj->format('d/m/Y'); ?></strong><br>
+                      <span style="font-size:12px;color:#6b7280;">
+                        <?php echo $libelleJour; ?>
+                      </span><br>
+                      <span class="roulement-code" style="display:inline-flex; align-items:center; justify-content:center; margin-top:6px; padding:2px 10px; min-width:24px; border-radius:9999px; font-size:12px; font-weight:600; background:#e5e7eb; color:#111827;">-</span>
+                    <?php else: ?>
+                      -
+                    <?php endif; ?>
                   </td>
-                  <td><?php echo htmlspecialchars($shift['chauffeur_nom'] ?? '-'); ?></td>
-                  <td><?php echo htmlspecialchars($shift['controleur_nom'] ?? '-'); ?></td>
-                  <td><?php echo htmlspecialchars($shift['receveur_nom'] ?? '-'); ?></td>
                   <td>
-                    <?php
-                    $statutClass = '';
-                    $statutLabel = '';
-                    switch ($shift['statut']) {
-                      case 'planifie':
-                        $statutClass = 'status-badge--actif';
-                        $statutLabel = 'Planifié';
-                        break;
-                      case 'actif':
-                        $statutClass = 'status-badge--maintenance';
-                        $statutLabel = 'En cours';
-                        break;
-                      case 'termine':
-                        $statutClass = 'status-badge--inactif';
-                        $statutLabel = 'Terminé';
-                        break;
-                      case 'annule':
-                        $statutClass = 'status-badge--panne';
-                        $statutLabel = 'Annulé';
-                        break;
-                      default:
-                        $statutClass = '';
-                        $statutLabel = $shift['statut'];
-                    }
-                    ?>
                     <span class="status-badge <?php echo $statutClass; ?>">
                       <?php echo $statutLabel; ?>
                     </span>
                   </td>
                   <td>
                     <div class="action-buttons">
-                      <button class="btn-icon" onclick="voirDetailsShift(<?php echo $shift['id']; ?>)" title="Voir détails">
-                        <i data-feather="eye"></i>
+                      <button class="btn-icon btn-icon--success" onclick="changerStatutShift(<?php echo (int) $shift['id']; ?>, 'actif')" title="Confirmer">
+                        <i data-feather="check"></i>
                       </button>
-                      <?php if ($shift['statut'] == 'planifie'): ?>
-                        <button class="btn-icon btn-icon--assign" onclick="envoyerNotification(<?php echo $shift['id']; ?>, '<?php echo htmlspecialchars($shift['bus_numero']); ?>', '<?php echo date('d/m/Y', strtotime($shift['date_prevue'])); ?>', '<?php echo substr($shift['heure_debut'], 0, 5); ?>', '<?php echo substr($shift['heure_fin'], 0, 5); ?>')" title="Envoyer notification">
-                          <i data-feather="send"></i>
-                        </button>
-                        <button class="btn-icon btn-icon--edit" onclick="changerStatutShift(<?php echo $shift['id']; ?>, 'actif')" title="Démarrer">
-                          <i data-feather="play"></i>
-                        </button>
-                        <button class="btn-icon btn-icon--delete" onclick="annulerShift(<?php echo $shift['id']; ?>)" title="Annuler">
-                          <i data-feather="x-circle"></i>
-                        </button>
-                      <?php elseif ($shift['statut'] == 'actif'): ?>
-                        <button class="btn-icon btn-icon--edit" onclick="changerStatutShift(<?php echo $shift['id']; ?>, 'termine')" title="Terminer">
-                          <i data-feather="check"></i>
-                        </button>
-                        <button class="btn-icon btn-icon--delete" onclick="annulerShift(<?php echo $shift['id']; ?>)" title="Annuler">
-                          <i data-feather="x-circle"></i>
-                        </button>
-                      <?php endif; ?>
+                      <button class="btn-icon btn-icon--delete" onclick="annulerShift(<?php echo (int) $shift['id']; ?>)" title="Révoquer">
+                        <i data-feather="slash"></i>
+                      </button>
+                      <button class="btn-icon btn-icon--assign" onclick="ouvrirReaffectation(<?php echo (int) $shift['id']; ?>)" title="Réaffecter">
+                        <i data-feather="shuffle"></i>
+                      </button>
                     </div>
                   </td>
                 </tr>
               <?php endforeach; ?>
             <?php else: ?>
               <tr>
-                <td colspan="8" style="text-align: center; padding: 40px;">
+                <td colspan="7" style="text-align: center; padding: 40px;">
                   <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
                     <i data-feather="calendar" style="width: 48px; height: 48px; color: #d1d5db;"></i>
-                    <p style="color: #6b7280; margin: 0; font-weight: 500;">Aucun shift trouvé</p>
-                    <?php if (isset($_GET['statut']) || isset($_GET['date']) || isset($_GET['bus'])): ?>
+                    <p style="color: #6b7280; margin: 0; font-weight: 500;">Aucun roulement trouvé</p>
+                    <?php if (isset($_GET['statut']) || isset($_GET['date'])): ?>
                       <p style="color: #9ca3af; margin: 0; font-size: 14px;">Essayez de modifier vos filtres</p>
                     <?php endif; ?>
                   </div>
@@ -186,6 +226,47 @@
           </div>
         </div>
       </section>
+
+      <!-- Modal choix du type de roulement (PL) - modèle 1 / 2 / R / - comme roulements-bc -->
+      <div class="modal" id="modalChoixRoulementPL">
+        <div class="modal__overlay" onclick="var m=document.getElementById('modalChoixRoulementPL');if(m){m.classList.remove('active');}window._celluleRoulementActive=null;"></div>
+        <div class="modal__content" style="max-width: 420px;">
+          <div class="modal__header">
+            <h2>Choisir le type de roulement</h2>
+            <button class="modal__close" id="btnCloseModalRoulementPL"
+                    onclick="var m=document.getElementById('modalChoixRoulementPL');if(m){m.classList.remove('active');}window._celluleRoulementActive=null;">
+              <i data-feather="x"></i>
+            </button>
+          </div>
+          <div class="modal__body">
+            <p style="font-size:14px; color:#6b7280;">Sélectionnez une des options pour ce jour.</p>
+            <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:12px;">
+              <button type="button" class="btn btn--primary"
+                      onclick="var c=window._celluleRoulementActive;if(c){var s=c.querySelector('.roulement-code');if(s){s.textContent='1';s.style.color='#111827';s.style.fontWeight='600';}}var m=document.getElementById('modalChoixRoulementPL');if(m){m.classList.remove('active');}window._celluleRoulementActive=null;">
+                1 - Shift du matin
+              </button>
+              <button type="button" class="btn btn--primary"
+                      onclick="var c=window._celluleRoulementActive;if(c){var s=c.querySelector('.roulement-code');if(s){s.textContent='2';s.style.color='#111827';s.style.fontWeight='600';}}var m=document.getElementById('modalChoixRoulementPL');if(m){m.classList.remove('active');}window._celluleRoulementActive=null;">
+                2 - Shift du soir
+              </button>
+              <button type="button" class="btn btn--secondary"
+                      onclick="var c=window._celluleRoulementActive;if(c){var s=c.querySelector('.roulement-code');if(s){s.textContent='R';s.style.color='#111827';s.style.fontWeight='600';}}var m=document.getElementById('modalChoixRoulementPL');if(m){m.classList.remove('active');}window._celluleRoulementActive=null;">
+                R - Repos
+              </button>
+              <button type="button" class="btn btn--secondary"
+                      onclick="var c=window._celluleRoulementActive;if(c){var s=c.querySelector('.roulement-code');if(s){s.textContent='-';s.style.color='#111827';s.style.fontWeight='600';}}var m=document.getElementById('modalChoixRoulementPL');if(m){m.classList.remove('active');}window._celluleRoulementActive=null;">
+                - Non affecté
+              </button>
+            </div>
+          </div>
+          <div class="modal__footer" style="text-align:right;">
+            <button type="button" class="btn btn--secondary" id="btnAnnulerRoulementPL"
+                    onclick="var m=document.getElementById('modalChoixRoulementPL');if(m){m.classList.remove('active');}window._celluleRoulementActive=null;">
+              Annuler
+            </button>
+          </div>
+        </div>
+      </div>
 
       <?php require_once 'includes/footer.php';  ?>
     </main>
@@ -417,11 +498,12 @@
 
   <!-- Modal pour les suggestions de shifts -->
   <div class="modal" id="modalSuggestions">
-    <div class="modal__overlay"></div>
+    <div class="modal__overlay" onclick="var m=document.getElementById('modalSuggestions');if(m){m.classList.remove('active');}"></div>
     <div class="modal__content" style="max-width: 800px;">
       <div class="modal__header">
         <h2>Suggestions de Shifts</h2>
-        <button class="modal__close" id="btnCloseModalSuggestions">
+        <button class="modal__close" id="btnCloseModalSuggestions"
+                onclick="var m=document.getElementById('modalSuggestions');if(m){m.classList.remove('active');}">
           <i data-feather="x"></i>
         </button>
       </div>
@@ -466,7 +548,8 @@
         </div>
       </div>
       <div class="modal__footer" style="justify-content: flex-end;">
-        <button type="button" class="btn btn--secondary" id="btnFermerSuggestions">Fermer</button>
+        <button type="button" class="btn btn--secondary" id="btnFermerSuggestions"
+                onclick="var m=document.getElementById('modalSuggestions');if(m){m.classList.remove('active');}">Fermer</button>
       </div>
     </div>
   </div>
@@ -474,16 +557,85 @@
   <script src="Public/js/app.js"></script>
   
   <script>
-    // Script pour la page shifts
+    // Script pour la page shifts / Roulement journalier
     document.addEventListener('DOMContentLoaded', function() {
       console.log('Page Shifts chargée');
       
-      // Mettre à jour la pagination
-      const totalShifts = <?php echo isset($shifts) ? count($shifts) : 0; ?>;
+      // Mettre à jour la pagination (en tenant compte des données de test si besoin)
+      const totalShifts = <?php
+        if (isset($shifts) && is_array($shifts) && count($shifts) > 0) {
+          echo count($shifts);
+        } else {
+          echo 10; // 10 données de test
+        }
+      ?>;
       document.getElementById('paginationTotalShift').textContent = totalShifts;
       document.getElementById('paginationStartShift').textContent = totalShifts > 0 ? '1' : '0';
       document.getElementById('paginationEndShift').textContent = totalShifts;
-      
+
+      // Gestion des cases à cocher (sélection de lignes)
+      const selectAllRoulements = document.getElementById('selectAllRoulements');
+      const checkboxesRoulements = document.querySelectorAll('.select-roulement');
+
+      if (selectAllRoulements) {
+        selectAllRoulements.addEventListener('change', function() {
+          checkboxesRoulements.forEach(cb => {
+            cb.checked = selectAllRoulements.checked;
+          });
+        });
+      }
+
+      function getSelectedShiftIds() {
+        const ids = [];
+        document.querySelectorAll('.select-roulement:checked').forEach(cb => {
+          const id = cb.getAttribute('data-shift-id');
+          if (id) ids.push(id);
+        });
+        return ids;
+      }
+
+      function handleMassAction(message) {
+        const ids = getSelectedShiftIds();
+        if (ids.length === 0) {
+          alert('Veuillez d\'abord sélectionner au moins un roulement.');
+          return;
+        }
+        alert(message + '\n(Shifts sélectionnés : ' + ids.join(', ') + ')');
+      }
+
+      const btnConfirmerSelection = document.getElementById('btnConfirmerSelection');
+      const btnRevoquerSelection = document.getElementById('btnRevoquerSelection');
+      const btnReaffecterSelection = document.getElementById('btnReaffecterSelection');
+      const btnNotifierSelection = document.getElementById('btnNotifierSelection');
+      const btnImprimerSelection = document.getElementById('btnImprimerSelection');
+
+      if (btnConfirmerSelection) {
+        btnConfirmerSelection.addEventListener('click', function() {
+          handleMassAction('Maquette : confirmation des roulements sélectionnés.');
+        });
+      }
+      if (btnRevoquerSelection) {
+        btnRevoquerSelection.addEventListener('click', function() {
+          handleMassAction('Maquette : révocation des roulements sélectionnés.');
+        });
+      }
+      if (btnReaffecterSelection) {
+        btnReaffecterSelection.addEventListener('click', function() {
+          handleMassAction('Maquette : réaffectation des roulements sélectionnés.');
+        });
+      }
+      if (btnNotifierSelection) {
+        btnNotifierSelection.addEventListener('click', function() {
+          handleMassAction('Maquette : envoi des notifications de confirmation.');
+        });
+      }
+      if (btnImprimerSelection) {
+        btnImprimerSelection.addEventListener('click', function() {
+          handleMassAction('Maquette : impression de la liste des roulements sélectionnés.');
+        });
+      }
+
+
       // Ouvrir modal suggestions
       document.getElementById('btnSuggererShifts').addEventListener('click', function() {
         document.getElementById('modalSuggestions').classList.add('active');
@@ -579,10 +731,60 @@
         // Rediriger vers la page equipe-bord avec les paramètres pré-remplis
         window.location.href = `<?php echo BASE_URL; ?>/equipe-bord?bus=${busNumero}&date=${date}&debut=${heureDebut}&fin=${heureFin}&chauffeur=${chauffeurId}&controleur=${controleurId}&receveur=${receveurId}&trajet=${trajetId}&auto_suggest=1`;
       };
-      
+
+      // Gestion du modal de roulement journalier (1 / 2 / R / -)
+      const modalRoulementPL = document.getElementById('modalChoixRoulementPL');
+      if (modalRoulementPL) {
+        let celluleRoulementActive = null;
+
+        // Ouvrir le modal au clic sur la cellule Date & jour
+        document.querySelectorAll('.cell-roulement-jour').forEach(function(cell) {
+          cell.addEventListener('click', function() {
+            celluleRoulementActive = this;
+            modalRoulementPL.classList.add('active');
+          });
+        });
+
+        // Choix 1 / 2 / R / -
+        modalRoulementPL.querySelectorAll('[data-shift-value]').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            if (!celluleRoulementActive) return;
+            const code = this.getAttribute('data-shift-value');
+            const span = celluleRoulementActive.querySelector('.roulement-code');
+            if (span) {
+              span.textContent = code;
+              span.style.color = '#111827';
+              span.style.fontWeight = '600';
+            }
+            modalRoulementPL.classList.remove('active');
+            celluleRoulementActive = null;
+          });
+        });
+
+        // Fermeture via overlay / X / Annuler
+        const overlayRoulement = modalRoulementPL.querySelector('.modal__overlay');
+        const btnCloseModalRoulementPL = document.getElementById('btnCloseModalRoulementPL');
+        const btnAnnulerRoulementPL = document.getElementById('btnAnnulerRoulementPL');
+
+        function fermerModalRoulementPL() {
+          modalRoulementPL.classList.remove('active');
+          celluleRoulementActive = null;
+        }
+
+        if (overlayRoulement) {
+          overlayRoulement.addEventListener('click', fermerModalRoulementPL);
+        }
+        if (btnCloseModalRoulementPL) {
+          btnCloseModalRoulementPL.addEventListener('click', fermerModalRoulementPL);
+        }
+        if (btnAnnulerRoulementPL) {
+          btnAnnulerRoulementPL.addEventListener('click', fermerModalRoulementPL);
+        }
+      }
+
       feather.replace();
     });
-    
+
     // Fonction pour voir les détails d'un shift
     function voirDetailsShift(shiftId) {
       const modal = document.getElementById('modalDetailsShift');
@@ -896,6 +1098,12 @@
     document.querySelector('#modalEnvoyerNotification .modal__overlay').addEventListener('click', function() {
       document.getElementById('modalEnvoyerNotification').classList.remove('active');
     });
+    });
+
+    // Maquette : ouverture de la réaffectation d'un roulement
+    function ouvrirReaffectation(shiftId) {
+      alert('Maquette : ouverture de la fenêtre de réaffectation pour le roulement #' + shiftId);
+    }
   </script>
 </body>
 </html>

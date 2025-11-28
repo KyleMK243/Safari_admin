@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="shortcut icon" href="Public/img/icons/safari-icone1.jpeg" />
-  <title>Paramètres Planification • Safari</title>
+  <title>Paramètres Billetterie • Safari</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -13,15 +13,15 @@
 </head>
 <body>
   <div class="app">
-    <?php require_once 'includes/menu_PL.php';  ?>
+    <?php require_once 'includes/menu_BT.php';  ?>
 
     <!-- Main content -->
     <main class="main">
       <!-- Header -->
       <header class="header">
         <div>
-          <h1>Paramètres - Planification</h1>
-          <p>Gestion des utilisateurs et permissions du département Planification</p>
+          <h1>Paramètres - Billetterie</h1>
+          <p>Gestion des utilisateurs et permissions du département Billetterie</p>
         </div>
       </header>
 
@@ -43,7 +43,7 @@
             <button class="btn btn--primary" id="btnNouvelUtilisateur">
               <i data-feather="user-plus"></i> Nouvel utilisateur
             </button>
-            <h3>Utilisateurs du département Planification</h3>
+            <h3>Utilisateurs du département Billetterie</h3>
           </div>
           
           <div style="overflow-x: auto;">
@@ -143,7 +143,7 @@
       <section class="tab-content" id="tab-permissions">
         <div class="card">
           <div class="card__header">
-            <h3>Permissions - Département Planification</h3>
+            <h3>Permissions - Département Billetterie</h3>
           </div>
           
           <div class="permissions-grid" id="permissionsContainer">
@@ -557,7 +557,7 @@
           let html = '';
           
           for (const role of roles) {
-            const response = await fetch(`/permissions/get-by-role?role=${role}`);
+            const response = await fetch(`/permissions/get-by-role?role=${role}&departement=BT`);
             const data = await response.json();
             
             console.log(`Données pour ${role}:`, data);

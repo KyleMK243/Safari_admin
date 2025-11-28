@@ -61,11 +61,18 @@ switch ($route) {
         break;
 
 
-    // Page d'accueil
+    // Page d'accueil PL
     case 'dashboard_PL':
         require_once ROOT_PATH . '/Controller/DashboardController.php';
         $dashboardController = new DashboardController();
         $dashboardController->index();
+        break;
+
+    // Page d'accueil Bureau de conception
+    case 'dashboard_BC':
+        require_once ROOT_PATH . '/Controller/DashboardBCController.php';
+        $dashboardBCController = new DashboardBCController();
+        $dashboardBCController->index();
         break;
     
     case 'dashboard/donnees':
@@ -168,10 +175,22 @@ switch ($route) {
         break;
 
     // Partie Trajets
-    case 'trajets':
+    case 'trajets': // Vue Bureau de conception
         require_once ROOT_PATH . '/Controller/TrajetsController.php';
         $trajetsController = new TrajetsController();
         $trajetsController->index();
+        break;
+
+    case 'trajets-pl': // Vue Planification (Admin - Planification)
+        require_once ROOT_PATH . '/Controller/TrajetsController.php';
+        $trajetsController = new TrajetsController();
+        $trajetsController->indexPL();
+        break;
+
+    case 'trajets/toggle-statut':
+        require_once ROOT_PATH . '/Controller/TrajetsController.php';
+        $trajetsController = new TrajetsController();
+        $trajetsController->toggleStatut();
         break;
     
     case 'trajets/details':
@@ -253,11 +272,17 @@ switch ($route) {
         $tarifsController->delete();
         break;
 
-    // Partie Shifts
-    case 'shifts':
+    // Partie Roulement journalier (PL)
+    case 'roulement-pl':
+    case 'shifts': // alias pour compatibilité
         require_once ROOT_PATH . '/Controller/ShiftsController.php';
         $shiftsController = new ShiftsController();
         $shiftsController->index();
+        break;
+
+    // Vue "tableau Excel" des roulements pour le Bureau de conception
+    case 'roulements-bc':
+        require_once ROOT_PATH . '/Views/roulements-bc.php';
         break;
     
     // Actions AJAX pour les shifts
@@ -316,7 +341,38 @@ switch ($route) {
         $alertesController->supprimer();
         break;
 
-    // Partie parametres
+    // Partie parametres - Par département
+    case 'parametres-pl':
+        require_once ROOT_PATH . '/Controller/ParametresController.php';
+        $parametresController = new ParametresController();
+        $parametresController->indexPL();
+        break;
+    
+    case 'parametres-bt':
+        require_once ROOT_PATH . '/Controller/ParametresController.php';
+        $parametresController = new ParametresController();
+        $parametresController->indexBT();
+        break;
+    
+    case 'parametres-rh':
+        require_once ROOT_PATH . '/Controller/ParametresController.php';
+        $parametresController = new ParametresController();
+        $parametresController->indexRH();
+        break;
+
+    case 'parametres-bc':
+        require_once ROOT_PATH . '/Controller/ParametresController.php';
+        $parametresController = new ParametresController();
+        $parametresController->indexBC();
+        break;
+    
+    case 'parametres-general':
+        require_once ROOT_PATH . '/Controller/ParametresController.php';
+        $parametresController = new ParametresController();
+        $parametresController->general();
+        break;
+    
+    // Ancienne route (redirection automatique selon département)
     case 'parametres':
         require_once ROOT_PATH . '/Controller/ParametresController.php';
         $parametresController = new ParametresController();
@@ -352,6 +408,25 @@ switch ($route) {
         require_once ROOT_PATH . '/Controller/ParametresController.php';
         $parametresController = new ParametresController();
         $parametresController->getUtilisateur();
+        break;
+    
+    // Actions AJAX pour les permissions
+    case 'permissions/get-by-role':
+        require_once ROOT_PATH . '/Controller/PermissionsController.php';
+        $permissionsController = new PermissionsController();
+        $permissionsController->getPermissionsByRole();
+        break;
+    
+    case 'permissions/toggle':
+        require_once ROOT_PATH . '/Controller/PermissionsController.php';
+        $permissionsController = new PermissionsController();
+        $permissionsController->togglePermission();
+        break;
+    
+    case 'permissions/init':
+        require_once ROOT_PATH . '/Controller/PermissionsController.php';
+        $permissionsController = new PermissionsController();
+        $permissionsController->initPermissions();
         break;
     
     case 'utilisateurs':

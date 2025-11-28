@@ -97,16 +97,23 @@ CREATE TABLE IF NOT EXISTS `arrets` (
   `temps_arret` int DEFAULT '3',
   `date_creation` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Listage des données de la table safari_smart_mobility.arrets : ~5 rows (environ)
+-- Listage des données de la table safari_smart_mobility.arrets : ~11 rows (environ)
 INSERT INTO `arrets` (`id`, `trajet_id`, `nom`, `latitude`, `longitude`, `distance_avec_debut`, `temp_parcour`, `temps_arret`, `date_creation`) VALUES
-	(1, 1, 'arret Don bosco', 3.00000000, NULL, NULL, NULL, 10, '2025-10-10 13:09:40'),
-	(2, 13, 'auto lubumbashi', 0.00000000, NULL, NULL, NULL, 3, '2025-10-11 05:22:07'),
-	(3, 14, 'auto lubumbashi 1', 3.00000000, NULL, NULL, NULL, 10, '2025-10-11 05:24:40'),
-	(4, 14, 'arret 1', 9.00000000, NULL, NULL, NULL, 14, '2025-10-11 05:24:40'),
-	(5, 14, 'b42', 13.00000000, NULL, NULL, NULL, 17, '2025-10-11 05:24:40'),
-	(6, 12, 'arret 112', 41.00000000, NULL, NULL, NULL, 10, '2025-10-11 05:25:30');
+	(28, 28, 'NIEMBA', -4.35516400, 15.32082800, 0.21000000, NULL, 0, '2025-10-22 11:37:35'),
+	(29, 28, 'HOPITAL', -4.35286400, 15.32153000, 0.48000000, NULL, 0, '2025-10-22 11:37:35'),
+	(30, 28, 'WASTA', -4.35469000, 15.32100800, 0.27000000, NULL, 0, '2025-10-22 11:37:35'),
+	(38, 29, 'LIBAYA', -4.38858700, 15.31165000, 0.19000000, NULL, 0, '2025-10-22 11:52:49'),
+	(41, 25, 'ABATOIRE', -4.11220000, 15.22330000, 17.53000000, NULL, 0, '2025-10-22 11:58:12'),
+	(42, 24, 'DE LA PLAINE', -4.11223455, 15.22113400, 37.14000000, NULL, 0, '2025-10-22 12:00:44'),
+	(43, 1, 'BOBOZO', -4.50010000, 15.11220000, 29.44000000, NULL, 0, '2025-10-22 12:01:38'),
+	(44, 1, 'KANANGA', -4.24550000, 15.36980000, 21.19000000, NULL, 0, '2025-10-22 12:01:38'),
+	(45, 1, 'ECOLE TOME', -4.65520000, 15.66320000, 53.19000000, NULL, 0, '2025-10-22 12:01:38'),
+	(46, 2, 'TOMBALBAY', -4.36500000, 15.20100000, 5.58000000, NULL, 0, '2025-10-22 12:03:42'),
+	(47, 2, 'COL. EBEYA', -4.36450000, 15.22442000, 10.71000000, NULL, 0, '2025-10-22 12:03:42'),
+	(48, 26, 'MOVENDA', -4.35329400, 15.30031100, 0.35000000, NULL, 0, '2025-10-22 12:30:51'),
+	(49, 26, 'RUE BOLAFA', -4.34828800, 15.30172700, 0.93000000, NULL, 0, '2025-10-22 12:30:51');
 
 -- Listage de la structure de table safari_smart_mobility. billets
 CREATE TABLE IF NOT EXISTS `billets` (
@@ -137,7 +144,7 @@ CREATE TABLE IF NOT EXISTS `billets` (
   `date_creation` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `numero_billet` (`numero_billet`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Listage des données de la table safari_smart_mobility.billets : ~17 rows (environ)
 INSERT INTO `billets` (`id`, `numero_billet`, `qr_code`, `trajet_id`, `tarif_id`, `shift_id`, `bus_id`, `client_id`, `arret_depart`, `arret_arrivee`, `date_voyage`, `heure_depart`, `siege_numero`, `prix_paye`, `devise`, `statut_billet`, `mode_paiement`, `reference_paiement`, `vendu_par`, `point_vente`, `date_achat`, `date_utilisation`, `date_annulation`, `motif_annulation`, `date_creation`) VALUES
@@ -158,7 +165,10 @@ INSERT INTO `billets` (`id`, `numero_billet`, `qr_code`, `trajet_id`, `tarif_id`
 	(17, 'BT-2025-139117', NULL, 14, 1, NULL, 14, NULL, 'auto lubumbashi 1', 'b42', '2025-10-15', NULL, NULL, 1923.00, 'CDF', 'paye', 'especes', NULL, NULL, NULL, '2025-10-15 01:48:58', NULL, NULL, NULL, '2025-10-15 01:48:58'),
 	(18, 'BT-2025-153424', NULL, 14, 1, NULL, 14, NULL, 'auto lubumbashi 1', 'b42', '2025-10-15', NULL, NULL, 1923.00, 'CDF', 'paye', 'especes', NULL, NULL, NULL, '2025-10-15 01:53:12', NULL, NULL, NULL, '2025-10-15 01:53:12'),
 	(19, 'BT-2025-143130', NULL, 14, 1, NULL, 14, NULL, 'auto lubumbashi 1', 'arret 1', '2025-10-15', NULL, NULL, 1154.00, 'CDF', 'paye', 'especes', NULL, NULL, NULL, '2025-10-15 01:55:54', NULL, NULL, NULL, '2025-10-15 01:55:54'),
-	(20, 'BT-2025-545090', NULL, 14, 1, NULL, 14, NULL, 'auto lubumbashi 1', 'arret 1', '2025-10-15', NULL, NULL, 1154.00, 'CDF', 'reserve', 'especes', NULL, NULL, NULL, '2025-10-15 02:09:58', NULL, NULL, NULL, '2025-10-15 02:09:58');
+	(20, 'BT-2025-545090', NULL, 14, 1, NULL, 14, NULL, 'auto lubumbashi 1', 'arret 1', '2025-10-15', NULL, NULL, 1154.00, 'CDF', 'reserve', 'especes', NULL, NULL, NULL, '2025-10-15 02:09:58', NULL, NULL, NULL, '2025-10-15 02:09:58'),
+	(21, 'BT-2025-430273', NULL, 1, 1, NULL, 1, NULL, 'BOBOZO', 'ECOLE TOME', '2025-10-16', NULL, NULL, 4567.00, 'CDF', 'paye', 'especes', NULL, NULL, NULL, '2025-10-16 03:12:52', NULL, NULL, NULL, '2025-10-16 03:12:52'),
+	(22, 'BT-2025-135620', NULL, 1, 1, NULL, 10, NULL, 'BOBOZO', 'ECOLE TOME', '2025-10-16', NULL, NULL, 7125.00, 'CDF', 'paye', 'especes', NULL, NULL, NULL, '2025-10-16 15:26:24', NULL, NULL, NULL, '2025-10-16 15:26:24'),
+	(23, 'BT-2025-168094', NULL, 1, 1, NULL, 10, NULL, 'BOBOZO', 'ECOLE TOME', '2025-10-16', NULL, NULL, 7125.00, 'CDF', 'paye', 'especes', NULL, NULL, NULL, '2025-10-16 15:31:59', NULL, NULL, NULL, '2025-10-16 15:31:59');
 
 -- Listage de la structure de table safari_smart_mobility. bus
 CREATE TABLE IF NOT EXISTS `bus` (
@@ -170,7 +180,7 @@ CREATE TABLE IF NOT EXISTS `bus` (
   `annee` int DEFAULT NULL,
   `capacite` int DEFAULT NULL,
   `kilometrage` int DEFAULT '0',
-  `ligne_affectee` varchar(100) DEFAULT '',
+  `trajet_id` int DEFAULT NULL,
   `statut` enum('actif','maintenance','panne','inactif') DEFAULT 'actif',
   `modules` text,
   `notes` text,
@@ -184,24 +194,24 @@ CREATE TABLE IF NOT EXISTS `bus` (
 ) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Listage des données de la table safari_smart_mobility.bus : ~17 rows (environ)
-INSERT INTO `bus` (`id`, `numero`, `immatriculation`, `marque`, `modele`, `annee`, `capacite`, `kilometrage`, `ligne_affectee`, `statut`, `modules`, `notes`, `derniere_activite`, `latitude`, `longitude`, `date_creation`) VALUES
-	(1, '421', 'KIN-1234-AB', 'Mercedes', 'Sprinter', 2022, 50, 125450, '1', 'actif', 'datcha,wifi,pos', '', '2025-01-08 07:45:00', -4.33091979, 15.27416397, '2025-10-08 17:23:37'),
-	(2, '315', 'KIN-5678-CD', 'Toyota', 'Coaster', 2021, 45, 98320, '2', 'actif', 'datcha,gps', '', '2025-01-08 08:10:00', -4.36482077, 15.29580424, '2025-10-08 17:23:37'),
-	(3, '208', 'KIN-9012-EF', 'Isuzu', 'NPR', 2020, 40, 156780, '3', 'maintenance', 'datcha', 'Révision moteur en cours', '2025-01-07 18:30:00', -4.35491650, 15.28040478, '2025-10-08 17:23:37'),
-	(4, '156', 'KIN-3456-GH', 'Mercedes', 'Sprinter', 2023, 50, 45200, '3', 'actif', 'datcha,wifi,pos,gps,camera', '', '2025-01-08 08:15:00', -4.36162660, 15.29305269, '2025-10-08 17:23:37'),
-	(5, '089', 'KIN-7890-IJ', 'Toyota', 'Hiace', 2019, 35, 187650, '1', 'panne', 'datcha', 'Problème de transmission', '2025-01-06 14:20:00', -4.27825676, 15.27195812, '2025-10-08 17:23:37'),
-	(6, '512', 'KIN-2468-KL', 'Hyundai', 'County', 2023, 45, 32100, '4', 'actif', 'datcha,wifi,gps', '', '2025-01-08 08:30:00', -4.33383911, 15.35733008, '2025-10-08 17:23:37'),
-	(7, '238', 'KIN-1357-MN', 'Mercedes', 'Sprinter', 2021, 50, 112890, '4', 'actif', 'datcha,wifi,pos,camera', '', '2025-01-08 08:25:00', -4.34023224, 15.26924853, '2025-10-08 17:23:37'),
-	(8, '310', 'KIN-9753-OP', 'Toyota', 'Coaster', 2020, 45, 143560, '4', 'actif', 'datcha,gps', '', '2025-01-08 08:20:00', -4.36146061, 15.32735135, '2025-10-08 17:23:37'),
-	(9, '175', 'KIN-4682-QR', 'Isuzu', 'NPR', 2022, 40, 67890, '1', 'inactif', 'datcha', 'En attente d\'affectation', '2025-01-04 16:00:00', NULL, NULL, '2025-10-08 17:23:37'),
-	(10, '642', 'KIN-8520-ST', 'Mercedes', 'Sprinter', 2024, 55, 12500, '1', 'actif', 'datcha,wifi,pos,gps,camera', 'Nouveau véhicule - Équipement complet', '2025-01-08 08:35:00', -4.30726142, 15.32403885, '2025-10-08 17:23:37'),
-	(11, '012', 'KIN-7855-TT', 'Mercedes', 'Sprinter', 2015, 50, 80000, '5', 'actif', 'datcha,wifi,pos,gps,camera', 'Nouveau véhicule - Équipement complet', '2025-10-10 18:24:01', -4.28642147, 15.33817610, '2025-10-08 17:32:58'),
-	(12, '001', 'AR-14452314-AZ', 'Hunda forgonette', 'GTY 147', 2018, 45, 12000, '3', 'actif', '', '-', '2025-10-10 23:04:20', -4.27825509, 15.33659625, '2025-10-10 22:04:20'),
-	(14, '002', 'AR-14452314-AS', 'Hunda forgonette', 'GTY 147', 2018, 45, 105000, '14', 'actif', 'datcha,wifi,pos', '-', '2025-10-15 02:05:20', -4.31065347, 15.27934388, '2025-10-10 22:06:09'),
-	(15, '003', 'KIN-54855-AX', 'Toyota', 'Coaster', 2021, 45, 12, '8', 'actif', 'datcha,wifi', '-', '2025-10-11 00:06:09', -4.29972017, 15.30576753, '2025-10-10 22:23:20'),
-	(16, '004', 'KIN-577855-AX', 'Toyota', 'Coaster', 2021, 45, 12, '7', 'actif', 'datcha,camera', '-', '2025-10-11 00:06:41', -4.30040186, 15.32308814, '2025-10-10 22:25:02'),
-	(17, '005', 'LSH-478961-AB', 'Mercedes', 'Sprinter', 2019, 50, 3000, '5', 'actif', 'datcha,wifi,pos,gps', 'Nouveau vehicule sans carte rose', '2025-10-11 00:05:51', -4.31175373, 15.31436694, '2025-10-10 22:40:12'),
-	(18, '006', 'LSH-4774451-AB', 'Karsan', 'e-ATA', 2025, 135, 150, '6', 'panne', 'datcha,wifi,pos,gps,camera', 'Ce bus embarque jusqu\'à 449 kWh d\'énergie dans des batteries lithium-fer-phosphate (LFP). L\'autonomie annoncée est de 450 km (rechargement complet en 3h10).', '2025-10-13 03:40:13', -4.32130409, 15.29277870, '2025-10-10 23:12:15');
+INSERT INTO `bus` (`id`, `numero`, `immatriculation`, `marque`, `modele`, `annee`, `capacite`, `kilometrage`, `trajet_id`, `statut`, `modules`, `notes`, `derniere_activite`, `latitude`, `longitude`, `date_creation`) VALUES
+	(1, '421', 'KIN-1234-AB', 'Mercedes', 'Sprinter', 2022, 50, 125450, 1, 'actif', 'datcha,wifi,pos', '', '2025-01-08 07:45:00', -4.33091979, 15.27416397, '2025-10-08 17:23:37'),
+	(2, '315', 'KIN-5678-CD', 'Toyota', 'Coaster', 2021, 45, 98320, 2, 'actif', 'datcha,gps', '', '2025-01-08 08:10:00', -4.36482077, 15.29580424, '2025-10-08 17:23:37'),
+	(3, '208', 'KIN-9012-EF', 'Isuzu', 'NPR', 2020, 40, 156780, 3, 'maintenance', 'datcha', 'Révision moteur en cours', '2025-01-07 18:30:00', -4.35491650, 15.28040478, '2025-10-08 17:23:37'),
+	(4, '156', 'KIN-3456-GH', 'Mercedes', 'Sprinter', 2023, 50, 45200, 3, 'actif', 'datcha,wifi,pos,gps,camera', '', '2025-01-08 08:15:00', -4.36162660, 15.29305269, '2025-10-08 17:23:37'),
+	(5, '089', 'KIN-7890-IJ', 'Toyota', 'Hiace', 2019, 35, 187650, 1, 'panne', 'datcha', 'Problème de transmission', '2025-01-06 14:20:00', -4.27825676, 15.27195812, '2025-10-08 17:23:37'),
+	(6, '512', 'KIN-2468-KL', 'Hyundai', 'County', 2023, 45, 32100, 4, 'actif', 'datcha,wifi,gps', '', '2025-01-08 08:30:00', -4.33383911, 15.35733008, '2025-10-08 17:23:37'),
+	(7, '238', 'KIN-1357-MN', 'Mercedes', 'Sprinter', 2021, 50, 112890, 4, 'actif', 'datcha,wifi,pos,camera', '', '2025-01-08 08:25:00', -4.34023224, 15.26924853, '2025-10-08 17:23:37'),
+	(8, '310', 'KIN-9753-OP', 'Toyota', 'Coaster', 2020, 45, 143560, 4, 'actif', 'datcha,gps', '', '2025-01-08 08:20:00', -4.36146061, 15.32735135, '2025-10-08 17:23:37'),
+	(9, '175', 'KIN-4682-QR', 'Isuzu', 'NPR', 2022, 40, 67890, 1, 'inactif', 'datcha', 'En attente d\'affectation', '2025-01-04 16:00:00', NULL, NULL, '2025-10-08 17:23:37'),
+	(10, '642', 'KIN-8520-ST', 'Mercedes', 'Sprinter', 2024, 55, 12500, 1, 'actif', 'datcha,wifi,pos,gps,camera', 'Nouveau véhicule - Équipement complet', '2025-01-08 08:35:00', -4.30726142, 15.32403885, '2025-10-08 17:23:37'),
+	(11, '012', 'KIN-7855-TT', 'Mercedes', 'Sprinter', 2015, 50, 80000, 5, 'actif', 'datcha,wifi,pos,gps,camera', 'Nouveau véhicule - Équipement complet', '2025-10-10 18:24:01', -4.28642147, 15.33817610, '2025-10-08 17:32:58'),
+	(12, '001', 'AR-14452314-AZ', 'Hunda forgonette', 'GTY 147', 2018, 45, 12000, 3, 'actif', '', '-', '2025-10-10 23:04:20', -4.27825509, 15.33659625, '2025-10-10 22:04:20'),
+	(14, '002', 'AR-14452314-AS', 'Hunda forgonette', 'GTY 147', 2018, 45, 105000, 14, 'actif', 'datcha,wifi,pos', '-', '2025-10-15 02:05:20', -4.31065347, 15.27934388, '2025-10-10 22:06:09'),
+	(15, '003', 'KIN-54855-AX', 'Toyota', 'Coaster', 2021, 45, 12, 8, 'actif', 'datcha,wifi', '-', '2025-10-11 00:06:09', -4.29972017, 15.30576753, '2025-10-10 22:23:20'),
+	(16, '004', 'KIN-577855-AX', 'Toyota', 'Coaster', 2021, 45, 12, 7, 'actif', 'datcha,camera', '-', '2025-10-11 00:06:41', -4.30040186, 15.32308814, '2025-10-10 22:25:02'),
+	(17, '005', 'LSH-478961-AB', 'Mercedes', 'Sprinter', 2019, 50, 3000, 5, 'actif', 'datcha,wifi,pos,gps', 'Nouveau vehicule sans carte rose', '2025-10-11 00:05:51', -4.31175373, 15.31436694, '2025-10-10 22:40:12'),
+	(18, '006', 'LSH-4774451-AB', 'Karsan', 'e-ATA', 2025, 135, 150, 6, 'panne', 'datcha,wifi,pos,gps,camera', 'Ce bus embarque jusqu\'à 449 kWh d\'énergie dans des batteries lithium-fer-phosphate (LFP). L\'autonomie annoncée est de 450 km (rechargement complet en 3h10).', '2025-10-13 03:40:13', -4.32130409, 15.29277870, '2025-10-10 23:12:15');
 
 -- Listage de la structure de table safari_smart_mobility. caisses
 CREATE TABLE IF NOT EXISTS `caisses` (
@@ -263,13 +273,14 @@ CREATE TABLE IF NOT EXISTS `clients` (
   `prenom` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `telephone` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `email` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `uid` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `date_creation` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Listage des données de la table safari_smart_mobility.clients : ~0 rows (environ)
-INSERT INTO `clients` (`id`, `nom`, `prenom`, `telephone`, `email`, `date_creation`) VALUES
-	(0, 'Mukendi', 'Jean', '+243 812 345 678', 'jean.mukendi@email.com', '2025-10-12 15:30:49');
+-- Listage des données de la table safari_smart_mobility.clients : ~1 rows (environ)
+INSERT INTO `clients` (`id`, `nom`, `prenom`, `telephone`, `email`, `uid`, `date_creation`) VALUES
+	(0, 'Mukendi', 'Jean', '+243 812 345 678', 'jean.mukendi@email.com', NULL, '2025-10-12 15:30:49');
 
 -- Listage de la structure de table safari_smart_mobility. colis
 CREATE TABLE IF NOT EXISTS `colis` (
@@ -384,7 +395,7 @@ CREATE TABLE IF NOT EXISTS `equipe_bord` (
   UNIQUE KEY `matricule` (`matricule`)
 ) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Listage des données de la table safari_smart_mobility.equipe_bord : ~27 rows (environ)
+-- Listage des données de la table safari_smart_mobility.equipe_bord : ~29 rows (environ)
 INSERT INTO `equipe_bord` (`id`, `nom`, `matricule`, `poste`, `telephone`, `email`, `adresse`, `date_naissance`, `bus_affecte`, `statut`, `date_embauche`, `type_contrat`, `salaire`, `photo`, `notes`, `date_creation`, `mot_de_passe`) VALUES
 	(1, 'Jean-Pierre Mukendi', 'EMP-2025-001', 'chauffeur', '+243 812 345 678', 'jp.mukendi@safari.cd', NULL, NULL, '421', 'actif', '2020-03-15', 'cdi', NULL, NULL, '5 ans d\'expérience', '2025-10-08 17:23:37', NULL),
 	(2, 'Marie Tshala', 'EMP-2025-002', 'chauffeur', '+243 823 456 789', 'm.tshala@safari.cd', NULL, NULL, '315', 'actif', '2019-06-20', 'cdi', NULL, NULL, 'Excellente conductrice', '2025-10-08 17:23:37', NULL),
@@ -506,6 +517,7 @@ CREATE TABLE IF NOT EXISTS `modules` (
   `nom` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
   `description` text COLLATE utf8mb4_general_ci,
   `departement` enum('PL','BT','RH') COLLATE utf8mb4_general_ci NOT NULL,
+  `section` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `icone` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `route` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
   `ordre` int DEFAULT '0',
@@ -516,32 +528,32 @@ CREATE TABLE IF NOT EXISTS `modules` (
 ) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Listage des données de la table safari_smart_mobility.modules : ~25 rows (environ)
-INSERT INTO `modules` (`id`, `code`, `nom`, `description`, `departement`, `icone`, `route`, `ordre`, `actif`, `date_creation`) VALUES
-	(1, 'pl_dashboard', 'Dashboard', 'Tableau de bord Planification', 'PL', 'home', 'dashboard_PL', 1, 1, '2025-10-08 15:07:12'),
-	(2, 'pl_gestion_bus', 'Gestion Bus', 'Gestion de la flotte de bus', 'PL', 'truck', 'gestion-bus', 2, 1, '2025-10-08 15:07:12'),
-	(3, 'pl_equipe_bord', 'Équipe de bord', 'Gestion des équipes de bord', 'PL', 'users', 'equipe-bord', 3, 1, '2025-10-08 15:07:12'),
-	(4, 'pl_trajets', 'Trajets', 'Gestion des trajets', 'PL', 'map', 'trajets', 4, 1, '2025-10-08 15:07:12'),
-	(5, 'pl_shifts', 'Gestion des services', 'Planification des shifts', 'PL', 'calendar', 'shifts', 5, 1, '2025-10-08 15:07:12'),
-	(6, 'pl_alertes', 'Alertes', 'Système d\'alertes', 'PL', 'bell', 'alerter', 6, 1, '2025-10-08 15:07:12'),
-	(7, 'pl_bi', 'Business Intelligence', 'Tableaux de bord et statistiques', 'PL', 'bar-chart-2', 'bi', 7, 1, '2025-10-08 15:07:12'),
-	(8, 'pl_parametres', 'Paramètres', 'Configuration du système', 'PL', 'settings', 'parametres', 8, 1, '2025-10-08 15:07:12'),
-	(9, 'bt_dashboard', 'Tableau de bord', 'Dashboard Billetterie', 'BT', 'home', 'billetterie', 1, 1, '2025-10-08 15:07:12'),
-	(10, 'bt_vente_billets', 'Vendre un billet', 'Vente de billets', 'BT', 'shopping-cart', 'vente-billets', 2, 1, '2025-10-08 15:07:12'),
-	(11, 'bt_reservation', 'Créer une réservation', 'Système de réservation', 'BT', 'calendar', 'reservation', 3, 1, '2025-10-08 15:07:12'),
-	(12, 'bt_historique', 'Historique', 'Historique des ventes', 'BT', 'list', 'historique', 4, 1, '2025-10-08 15:07:12'),
-	(13, 'bt_nouvelle_carte', 'Créer une carte', 'Création de cartes prépayées', 'BT', 'plus-circle', 'nouvelle-carte', 5, 1, '2025-10-08 15:07:12'),
-	(14, 'bt_cartes_prepayees', 'Liste des cartes', 'Gestion des cartes prépayées', 'BT', 'credit-card', 'cartes-prepayees', 6, 1, '2025-10-08 15:07:12'),
-	(15, 'bt_tarifs', 'Gestion de tarif', 'Configuration des tarifs', 'BT', 'tag', 'tarifs', 7, 1, '2025-10-08 15:07:12'),
-	(16, 'bt_canaux_vente', 'Canaux de vente', 'Gestion des canaux', 'BT', 'shopping-bag', 'canaux-vente', 8, 1, '2025-10-08 15:07:12'),
-	(17, 'bt_clients', 'Clients', 'Gestion des clients', 'BT', 'users', 'clients-bt', 9, 1, '2025-10-08 15:07:12'),
-	(18, 'bt_reclamations', 'Réclamations', 'Gestion des réclamations', 'BT', 'message-circle', 'reclamations', 10, 1, '2025-10-08 15:07:12'),
-	(19, 'bt_statistiques', 'Statistiques', 'Statistiques de vente', 'BT', 'bar-chart-2', 'statistiques-bt', 11, 1, '2025-10-08 15:07:12'),
-	(20, 'bt_locations', 'Gestion des locations', 'Location de véhicules', 'BT', 'truck', 'locations', 12, 1, '2025-10-08 15:07:12'),
-	(21, 'bt_historique_locations', 'Historique locations', 'Historique des locations', 'BT', 'clock', 'historique-locations', 13, 1, '2025-10-08 15:07:12'),
-	(22, 'rh_dashboard', 'Tableau de bord', 'Dashboard RH', 'RH', 'home', 'rh-dashboard', 1, 1, '2025-10-08 15:07:13'),
-	(23, 'rh_personnel', 'Gestion du personnel', 'Liste et gestion des employés', 'RH', 'users', 'personnel', 2, 1, '2025-10-08 15:07:13'),
-	(24, 'rh_nouveau_agent', 'Ajouter un agent', 'Recrutement d\'un nouvel agent', 'RH', 'user-plus', 'nouveau-agent', 3, 1, '2025-10-08 15:07:13'),
-	(25, 'rh_contrats', 'Gestion des contrats', 'Gestion des contrats de travail', 'RH', 'file-text', 'contrats', 4, 1, '2025-10-08 15:07:13');
+INSERT INTO `modules` (`id`, `code`, `nom`, `description`, `departement`, `section`, `icone`, `route`, `ordre`, `actif`, `date_creation`) VALUES
+	(1, 'pl_dashboard', 'Dashboard', 'Tableau de bord Planification', 'PL', NULL, 'home', 'dashboard_PL', 1, 1, '2025-10-08 15:07:12'),
+	(2, 'pl_gestion_bus', 'Gestion Bus', 'Gestion de la flotte de bus', 'PL', 'CONCEPTION', 'truck', 'gestion-bus', 2, 1, '2025-10-08 15:07:12'),
+	(3, 'pl_equipe_bord', 'Équipe de bord', 'Gestion des équipes de bord', 'PL', 'PLANIFICATION', 'users', 'equipe-bord', 3, 1, '2025-10-08 15:07:12'),
+	(4, 'pl_trajets', 'Trajets', 'Gestion des trajets', 'PL', 'CONCEPTION', 'map', 'trajets', 4, 1, '2025-10-08 15:07:12'),
+	(5, 'pl_shifts', 'Gestion des services', 'Planification des shifts', 'PL', 'PLANIFICATION', 'calendar', 'shifts', 5, 1, '2025-10-08 15:07:12'),
+	(6, 'pl_alertes', 'Alertes', 'Système d\'alertes', 'PL', 'STATISTIQUES', 'bell', 'alerter', 6, 1, '2025-10-08 15:07:12'),
+	(7, 'pl_bi', 'Business Intelligence', 'Tableaux de bord et statistiques', 'PL', 'STATISTIQUES', 'bar-chart-2', 'bi', 7, 1, '2025-10-08 15:07:12'),
+	(8, 'pl_parametres', 'Paramètres', 'Configuration du système', 'PL', NULL, 'settings', 'parametres', 8, 1, '2025-10-08 15:07:12'),
+	(9, 'bt_dashboard', 'Tableau de bord', 'Dashboard Billetterie', 'BT', NULL, 'home', 'billetterie', 1, 1, '2025-10-08 15:07:12'),
+	(10, 'bt_vente_billets', 'Vendre un billet', 'Vente de billets', 'BT', NULL, 'shopping-cart', 'vente-billets', 2, 1, '2025-10-08 15:07:12'),
+	(11, 'bt_reservation', 'Créer une réservation', 'Système de réservation', 'BT', NULL, 'calendar', 'reservation', 3, 1, '2025-10-08 15:07:12'),
+	(12, 'bt_historique', 'Historique', 'Historique des ventes', 'BT', NULL, 'list', 'historique', 4, 1, '2025-10-08 15:07:12'),
+	(13, 'bt_nouvelle_carte', 'Créer une carte', 'Création de cartes prépayées', 'BT', NULL, 'plus-circle', 'nouvelle-carte', 5, 1, '2025-10-08 15:07:12'),
+	(14, 'bt_cartes_prepayees', 'Liste des cartes', 'Gestion des cartes prépayées', 'BT', NULL, 'credit-card', 'cartes-prepayees', 6, 1, '2025-10-08 15:07:12'),
+	(15, 'bt_tarifs', 'Gestion de tarif', 'Configuration des tarifs', 'BT', NULL, 'tag', 'tarifs', 7, 1, '2025-10-08 15:07:12'),
+	(16, 'bt_canaux_vente', 'Canaux de vente', 'Gestion des canaux', 'BT', NULL, 'shopping-bag', 'canaux-vente', 8, 1, '2025-10-08 15:07:12'),
+	(17, 'bt_clients', 'Clients', 'Gestion des clients', 'BT', NULL, 'users', 'clients-bt', 9, 1, '2025-10-08 15:07:12'),
+	(18, 'bt_reclamations', 'Réclamations', 'Gestion des réclamations', 'BT', NULL, 'message-circle', 'reclamations', 10, 1, '2025-10-08 15:07:12'),
+	(19, 'bt_statistiques', 'Statistiques', 'Statistiques de vente', 'BT', NULL, 'bar-chart-2', 'statistiques-bt', 11, 1, '2025-10-08 15:07:12'),
+	(20, 'bt_locations', 'Gestion des locations', 'Location de véhicules', 'BT', NULL, 'truck', 'locations', 12, 1, '2025-10-08 15:07:12'),
+	(21, 'bt_historique_locations', 'Historique locations', 'Historique des locations', 'BT', NULL, 'clock', 'historique-locations', 13, 1, '2025-10-08 15:07:12'),
+	(22, 'rh_dashboard', 'Tableau de bord', 'Dashboard RH', 'RH', NULL, 'home', 'rh-dashboard', 1, 1, '2025-10-08 15:07:13'),
+	(23, 'rh_personnel', 'Gestion du personnel', 'Liste et gestion des employés', 'RH', NULL, 'users', 'personnel', 2, 1, '2025-10-08 15:07:13'),
+	(24, 'rh_nouveau_agent', 'Ajouter un agent', 'Recrutement d\'un nouvel agent', 'RH', NULL, 'user-plus', 'nouveau-agent', 3, 1, '2025-10-08 15:07:13'),
+	(25, 'rh_contrats', 'Gestion des contrats', 'Gestion des contrats de travail', 'RH', NULL, 'file-text', 'contrats', 4, 1, '2025-10-08 15:07:13');
 
 -- Listage de la structure de table safari_smart_mobility. notifications
 CREATE TABLE IF NOT EXISTS `notifications` (
@@ -717,14 +729,20 @@ CREATE TABLE IF NOT EXISTS `points_chifte` (
   `longitude` decimal(10,8) DEFAULT NULL,
   `distance_avec_debut` decimal(10,2) DEFAULT NULL,
   `temp_parcour` decimal(10,8) DEFAULT NULL,
-  `temps_arret` decimal(10,2) DEFAULT NULL,
+  `temps_arret` decimal(10,2) DEFAULT '3.00',
   `date_creation` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Listage des données de la table safari_smart_mobility.points_chifte : ~0 rows (environ)
+-- Listage des données de la table safari_smart_mobility.points_chifte : ~6 rows (environ)
 INSERT INTO `points_chifte` (`id`, `trajet_id`, `nom`, `latitude`, `longitude`, `distance_avec_debut`, `temp_parcour`, `temps_arret`, `date_creation`) VALUES
-	(1, 14, 'shift 1', 10.00000000, NULL, NULL, NULL, NULL, '2025-10-11 05:24:40');
+	(1, 14, 'shift 1', 10.00000000, NULL, NULL, NULL, NULL, '2025-10-11 05:24:40'),
+	(10, 28, 'UPC', -4.33335500, 15.29738700, 3.66, 5.00000000, 3.00, '2025-10-22 11:37:35'),
+	(15, 27, 'shift 1', -4.32210000, 15.40660000, 38.10, 57.00000000, 3.00, '2025-10-22 11:53:44'),
+	(17, 25, 'Saint Raphael', -4.58990000, 15.00577000, 42.32, 63.00000000, 3.00, '2025-10-22 11:58:12'),
+	(18, 24, '12EME RUE', -4.11223655, 15.11234474, 40.17, 60.00000000, 3.00, '2025-10-22 12:00:44'),
+	(19, 1, 'MATERNITE', -4.14230000, 15.33660000, 20.76, 31.00000000, 3.00, '2025-10-22 12:01:38'),
+	(20, 26, 'Semenon', -4.34556600, 15.30264000, 1.25, 2.00000000, 3.00, '2025-10-22 12:30:51');
 
 -- Listage de la structure de table safari_smart_mobility. points_vente
 CREATE TABLE IF NOT EXISTS `points_vente` (
@@ -880,9 +898,9 @@ CREATE TABLE IF NOT EXISTS `tarifs` (
   `date_fin` date DEFAULT NULL,
   `date_creation` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=97 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Listage des données de la table safari_smart_mobility.tarifs : ~16 rows (environ)
+-- Listage des données de la table safari_smart_mobility.tarifs : ~94 rows (environ)
 INSERT INTO `tarifs` (`id`, `nom`, `trajet_id`, `type_tarif`, `prix`, `devise`, `statut`, `date_debut`, `date_fin`, `date_creation`) VALUES
 	(1, 'Tarif Normal - Gare Centrale - Lemba', 1, 'normal', 3000.00, 'CDF', 'actif', '2025-01-01', NULL, '2025-10-14 23:30:08'),
 	(2, 'Tarif Étudiant - Gare Centrale - Lemba', 1, 'etudiant', 2550.00, 'CDF', 'actif', '2025-01-01', NULL, '2025-10-14 23:30:08'),
@@ -899,7 +917,87 @@ INSERT INTO `tarifs` (`id`, `nom`, `trajet_id`, `type_tarif`, `prix`, `devise`, 
 	(13, 'Tarif Normal - Gare Centrale - Selembao', 14, 'normal', 2750.00, 'CDF', 'actif', '2025-01-01', NULL, '2025-10-14 23:30:08'),
 	(14, 'Tarif Étudiant - Gare Centrale - Selembao', 14, 'etudiant', 2337.50, 'CDF', 'actif', '2025-01-01', NULL, '2025-10-14 23:30:08'),
 	(15, 'Tarif Senior - Gare Centrale - Selembao', 14, 'senior', 2475.00, 'CDF', 'actif', '2025-01-01', NULL, '2025-10-14 23:30:08'),
-	(16, 'Tarif Enfant - Gare Centrale - Selembao', 14, 'enfant', 2200.00, 'CDF', 'actif', '2025-01-01', NULL, '2025-10-14 23:30:08');
+	(16, 'Tarif Enfant - Gare Centrale - Selembao', 14, 'enfant', 2200.00, 'CDF', 'actif', '2025-01-01', NULL, '2025-10-14 23:30:08'),
+	(17, 'Tarif Normal - Gare Centrale - Bandalungwa', 7, 'normal', 200.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:23:38'),
+	(18, 'Tarif Étudiant - Gare Centrale - Bandalungwa', 7, 'etudiant', 170.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:23:39'),
+	(19, 'Tarif Senior - Gare Centrale - Bandalungwa', 7, 'senior', 180.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:23:39'),
+	(20, 'Tarif Enfant - Gare Centrale - Bandalungwa', 7, 'enfant', 160.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:23:39'),
+	(21, 'Tarif Normal - Gare Centrale - Barumbu', 10, 'normal', 150.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:25:51'),
+	(22, 'Tarif Étudiant - Gare Centrale - Barumbu', 10, 'etudiant', 127.50, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:25:51'),
+	(23, 'Tarif Senior - Gare Centrale - Barumbu', 10, 'senior', 135.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:25:51'),
+	(24, 'Tarif Enfant - Gare Centrale - Barumbu', 10, 'enfant', 120.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:25:51'),
+	(25, 'Tarif Normal - Gare Centrale - Bandalungwa', 7, 'normal', 150.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:26:21'),
+	(26, 'Tarif Étudiant - Gare Centrale - Bandalungwa', 7, 'etudiant', 127.50, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:26:21'),
+	(27, 'Tarif Senior - Gare Centrale - Bandalungwa', 7, 'senior', 135.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:26:21'),
+	(28, 'Tarif Enfant - Gare Centrale - Bandalungwa', 7, 'enfant', 120.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:26:21'),
+	(29, 'Tarif Normal - Gare Centrale - Kalamu', 5, 'normal', 300.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:31:13'),
+	(30, 'Tarif Étudiant - Gare Centrale - Kalamu', 5, 'etudiant', 255.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:31:13'),
+	(31, 'Tarif Senior - Gare Centrale - Kalamu', 5, 'senior', 270.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:31:13'),
+	(32, 'Tarif Enfant - Gare Centrale - Kalamu', 5, 'enfant', 240.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:31:13'),
+	(33, 'Tarif Normal - Gare Centrale - Bandalungwa', 7, 'normal', 250.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:33:03'),
+	(34, 'Tarif Étudiant - Gare Centrale - Bandalungwa', 7, 'etudiant', 213.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:33:03'),
+	(35, 'Tarif Enfant - Gare Centrale - Bandalungwa', 7, 'enfant', 200.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:33:03'),
+	(36, 'Tarif Senior - Gare Centrale - Bandalungwa', 7, 'senior', 225.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:33:03'),
+	(37, 'Tarif Normal - Gare Centrale - Kasa-Vubu', 8, 'normal', 1450.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:36:43'),
+	(38, 'Tarif Étudiant - Gare Centrale - Kasa-Vubu', 8, 'etudiant', 1232.50, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:36:44'),
+	(39, 'Tarif Senior - Gare Centrale - Kasa-Vubu', 8, 'senior', 1305.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:36:44'),
+	(40, 'Tarif Enfant - Gare Centrale - Kasa-Vubu', 8, 'enfant', 1160.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:36:44'),
+	(41, 'Tarif Normal - Gare Centrale - Kasa-Vubu', 8, 'normal', 150.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:36:59'),
+	(42, 'Tarif Étudiant - Gare Centrale - Kasa-Vubu', 8, 'etudiant', 128.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:36:59'),
+	(43, 'Tarif Enfant - Gare Centrale - Kasa-Vubu', 8, 'enfant', 120.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:36:59'),
+	(44, 'Tarif Senior - Gare Centrale - Kasa-Vubu', 8, 'senior', 135.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:37:00'),
+	(45, 'Tarif Normal - Gare Centrale - Kimbanseke', 13, 'normal', 1900.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:38:41'),
+	(46, 'Tarif Senior - Gare Centrale - Kimbanseke', 13, 'senior', 1710.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:38:41'),
+	(47, 'Tarif Étudiant - Gare Centrale - Kimbanseke', 13, 'etudiant', 1615.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:38:41'),
+	(48, 'Tarif Enfant - Gare Centrale - Kimbanseke', 13, 'enfant', 1520.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:38:41'),
+	(49, 'Tarif Normal - Gare Centrale - Kimbanseke', 13, 'normal', 1500.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:38:57'),
+	(50, 'Tarif Étudiant - Gare Centrale - Kimbanseke', 13, 'etudiant', 1275.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:38:57'),
+	(51, 'Tarif Enfant - Gare Centrale - Kimbanseke', 13, 'enfant', 1200.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:38:57'),
+	(52, 'Tarif Senior - Gare Centrale - Kimbanseke', 13, 'senior', 1350.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:38:58'),
+	(53, 'Tarif Normal - Gare Centrale - Kimbanseke', 13, 'normal', 1500.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:39:28'),
+	(54, 'Tarif Étudiant - Gare Centrale - Kimbanseke', 13, 'etudiant', 1275.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:39:28'),
+	(55, 'Tarif Senior - Gare Centrale - Kimbanseke', 13, 'senior', 1350.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:39:28'),
+	(56, 'Tarif Enfant - Gare Centrale - Kimbanseke', 13, 'enfant', 1200.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:39:28'),
+	(57, 'Tarif Normal - Gare Centrale - Kimbanseke', 13, 'normal', 1600.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:40:52'),
+	(58, 'Tarif Senior - Gare Centrale - Kimbanseke', 13, 'senior', 1440.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:40:52'),
+	(59, 'Tarif Étudiant - Gare Centrale - Kimbanseke', 13, 'etudiant', 1360.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:40:52'),
+	(60, 'Tarif Enfant - Gare Centrale - Kimbanseke', 13, 'enfant', 1280.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:40:52'),
+	(61, 'Tarif Normal - Gare Centrale - Kimbanseke', 13, 'normal', 1550.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:42:27'),
+	(62, 'Tarif Étudiant - Gare Centrale - Kimbanseke', 13, 'etudiant', 1318.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:42:27'),
+	(63, 'Tarif Senior - Gare Centrale - Kimbanseke', 13, 'senior', 1395.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:42:27'),
+	(64, 'Tarif Enfant - Gare Centrale - Kimbanseke', 13, 'enfant', 1240.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 03:42:27'),
+	(65, 'Tarif Normal - Gare Centrale - Kimbanseke', 13, 'normal', 1600.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:07:29'),
+	(66, 'Tarif Senior - Gare Centrale - Kimbanseke', 13, 'senior', 1440.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:07:29'),
+	(67, 'Tarif Étudiant - Gare Centrale - Kimbanseke', 13, 'etudiant', 1360.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:07:29'),
+	(68, 'Tarif Enfant - Gare Centrale - Kimbanseke', 13, 'enfant', 1280.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:07:29'),
+	(69, 'Tarif Senior - Gare Centrale - Kimbanseke', 13, 'senior', 1440.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:07:51'),
+	(70, 'Tarif Étudiant - Gare Centrale - Kimbanseke', 13, 'etudiant', 1360.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:07:51'),
+	(71, 'Tarif Enfant - Gare Centrale - Kimbanseke', 13, 'enfant', 1280.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:07:51'),
+	(72, 'Tarif Normal - Gare Centrale - Kimbanseke', 13, 'normal', 1600.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:07:51'),
+	(73, 'Tarif Normal - KISANGANI - KINMAZIERE', 24, 'normal', 200.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:08:34'),
+	(74, 'Tarif Étudiant - KISANGANI - KINMAZIERE', 24, 'etudiant', 170.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:08:34'),
+	(75, 'Tarif Senior - KISANGANI - KINMAZIERE', 24, 'senior', 180.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:08:35'),
+	(76, 'Tarif Enfant - KISANGANI - KINMAZIERE', 24, 'enfant', 160.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:08:35'),
+	(77, 'Tarif Normal - KISANGANI - KINMAZIERE', 24, 'normal', 300.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:08:53'),
+	(78, 'Tarif Étudiant - KISANGANI - KINMAZIERE', 24, 'etudiant', 255.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:08:53'),
+	(79, 'Tarif Senior - KISANGANI - KINMAZIERE', 24, 'senior', 270.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:08:53'),
+	(80, 'Tarif Enfant - KISANGANI - KINMAZIERE', 24, 'enfant', 240.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:08:53'),
+	(81, 'Tarif Normal - KISANGANI - KINMAZIERE', 24, 'normal', 300.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:09:09'),
+	(82, 'Tarif Enfant - KISANGANI - KINMAZIERE', 24, 'enfant', 240.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:09:09'),
+	(83, 'Tarif Senior - KISANGANI - KINMAZIERE', 24, 'senior', 270.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:09:09'),
+	(84, 'Tarif Étudiant - KISANGANI - KINMAZIERE', 24, 'etudiant', 255.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:09:09'),
+	(85, 'Tarif Normal - Gare Centrale - Kimbanseke', 13, 'normal', 100.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:14:16'),
+	(86, 'Tarif Étudiant - Gare Centrale - Kimbanseke', 13, 'etudiant', 85.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:14:16'),
+	(87, 'Tarif Enfant - Gare Centrale - Kimbanseke', 13, 'enfant', 80.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:14:16'),
+	(88, 'Tarif Senior - Gare Centrale - Kimbanseke', 13, 'senior', 90.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:14:16'),
+	(89, 'Tarif Senior - UPN - GARE CENTRALE', 1, 'senior', 270.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:14:53'),
+	(90, 'Tarif Normal - UPN - GARE CENTRALE', 1, 'normal', 300.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:14:53'),
+	(91, 'Tarif Étudiant - UPN - GARE CENTRALE', 1, 'etudiant', 255.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:14:53'),
+	(92, 'Tarif Enfant - UPN - GARE CENTRALE', 1, 'enfant', 240.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:14:53'),
+	(93, 'Tarif Normal - Gare Centrale - Ndjili', 12, 'normal', 450.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:18:53'),
+	(94, 'Tarif Étudiant - Gare Centrale - Ndjili', 12, 'etudiant', 383.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:18:53'),
+	(95, 'Tarif Senior - Gare Centrale - Ndjili', 12, 'senior', 405.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:18:53'),
+	(96, 'Tarif Enfant - Gare Centrale - Ndjili', 12, 'enfant', 360.00, 'CDF', 'actif', NULL, NULL, '2025-10-16 04:18:53');
 
 -- Listage de la structure de table safari_smart_mobility. trajets
 CREATE TABLE IF NOT EXISTS `trajets` (
@@ -913,35 +1011,21 @@ CREATE TABLE IF NOT EXISTS `trajets` (
   `longitude_depart` decimal(11,8) DEFAULT NULL,
   `latitude_arrivee` decimal(10,8) DEFAULT NULL,
   `longitude_arrivee` decimal(11,8) DEFAULT NULL,
+  `couleur` varchar(50) DEFAULT NULL,
   `date_creation` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Listage des données de la table safari_smart_mobility.trajets : ~23 rows (environ)
-INSERT INTO `trajets` (`id`, `code`, `nom`, `distance_totale`, `duree_estimee`, `statut`, `latitude_depart`, `longitude_depart`, `latitude_arrivee`, `longitude_arrivee`, `date_creation`) VALUES
-	(1, 'L1', 'Gare Centrale - Lemba', 12.00, '45', 'actif', -4.32760000, 15.31360000, -4.38000000, 15.35000000, '2025-10-14 11:09:38'),
-	(2, 'L2', 'Gare Centrale - Matete', 15.00, '50', 'actif', -4.32760000, 15.31360000, -4.36500000, 15.28000000, '2025-10-14 11:09:38'),
-	(3, 'L3', 'Gare Centrale - Kintambo', 5.00, '25', 'actif', -4.32760000, 15.31360000, -4.31000000, 15.29000000, '2025-10-14 11:09:38'),
-	(4, 'L4', 'Victoire - Lemba', 8.00, '35', 'actif', -4.32000000, 15.32000000, -4.38000000, 15.35000000, '2025-10-14 11:09:38'),
-	(5, 'L5', 'Gare Centrale - Kalamu', 7.00, '30', 'actif', -4.32760000, 15.31360000, -4.35000000, 15.33000000, '2025-10-14 11:09:38'),
-	(6, 'L6', 'Gare Centrale - Ngaliema', 10.00, '40', 'actif', -4.32760000, 15.31360000, -4.29000000, 15.26000000, '2025-10-14 11:09:38'),
-	(7, 'L7', 'Gare Centrale - Bandalungwa', 9.00, '38', 'actif', -4.32760000, 15.31360000, -4.36000000, 15.29000000, '2025-10-14 11:09:38'),
-	(8, 'L8', 'Gare Centrale - Kasa-Vubu', 6.00, '28', 'actif', -4.32760000, 15.31360000, -4.34500000, 15.30500000, '2025-10-14 11:09:38'),
-	(9, 'L9', 'Gare Centrale - Lingwala', 4.00, '20', 'actif', -4.32760000, 15.31360000, -4.31500000, 15.30500000, '2025-10-14 11:09:38'),
-	(10, 'L10', 'Gare Centrale - Barumbu', 3.00, '18', 'actif', -4.32760000, 15.31360000, -4.32000000, 15.32500000, '2025-10-14 11:09:38'),
-	(11, 'L11', 'Gare Centrale - Masina', 16.00, '55', 'actif', -4.32760000, 15.31360000, -4.40000000, 15.38000000, '2025-10-14 11:09:38'),
-	(12, 'L12', 'Gare Centrale - Ndjili', 18.00, '60', 'actif', -4.32760000, 15.31360000, -4.38500000, 15.42000000, '2025-10-14 11:09:38'),
-	(13, 'L13', 'Gare Centrale - Kimbanseke', 20.00, '65', 'actif', -4.32760000, 15.31360000, -4.42000000, 15.36000000, '2025-10-14 11:09:38'),
-	(14, 'L14', 'Gare Centrale - Selembao', 11.00, '42', 'actif', -4.32760000, 15.31360000, -4.37000000, 15.27000000, '2025-10-14 11:09:38'),
-	(15, 'L15', 'Victoire - Matete', 12.00, '45', 'actif', -4.32000000, 15.32000000, -4.36500000, 15.28000000, '2025-10-14 11:09:38'),
-	(16, 'L16', 'Lemba - Masina', 10.00, '40', 'actif', -4.38000000, 15.35000000, -4.40000000, 15.38000000, '2025-10-14 11:09:38'),
-	(17, 'L17', 'Gare Centrale - Limete', 13.00, '48', 'actif', -4.32760000, 15.31360000, -4.36500000, 15.34000000, '2025-10-14 11:09:38'),
-	(18, 'L18', 'Gare Centrale - Makala', 8.00, '35', 'actif', -4.32760000, 15.31360000, -4.35500000, 15.28500000, '2025-10-14 11:09:38'),
-	(19, 'L19', 'Kalamu - Lemba', 6.00, '28', 'actif', -4.35000000, 15.33000000, -4.38000000, 15.35000000, '2025-10-14 11:09:38'),
-	(20, 'L20', 'Gare Centrale - Ngaba', 7.00, '32', 'actif', -4.32760000, 15.31360000, -4.34800000, 15.29500000, '2025-10-14 11:09:38'),
-	(21, 'L21', 'Matete - Ndjili', 9.00, '38', 'actif', -4.36500000, 15.28000000, -4.38500000, 15.42000000, '2025-10-14 11:09:38'),
-	(22, 'L22', 'Gare Centrale - Kingabwa', 14.00, '50', 'actif', -4.32760000, 15.31360000, -4.28000000, 15.36000000, '2025-10-14 11:09:38'),
-	(23, 'L23', 'Victoire - Kimbanseke', 17.00, '58', 'actif', -4.32000000, 15.32000000, -4.42000000, 15.36000000, '2025-10-14 11:09:38');
+-- Listage des données de la table safari_smart_mobility.trajets : ~8 rows (environ)
+INSERT INTO `trajets` (`id`, `code`, `nom`, `distance_totale`, `duree_estimee`, `statut`, `latitude_depart`, `longitude_depart`, `latitude_arrivee`, `longitude_arrivee`, `couleur`, `date_creation`) VALUES
+	(1, 'L1', 'UPN - GARE CENTRALE', 12.89, '45', 'actif', -4.40548800, 15.25721300, -4.30711700, 15.31872100, '#3b82f6', '2025-10-14 11:09:38'),
+	(2, 'L2', 'LEMBA - HOTEL DES POSTES', 9.47, '50', 'actif', -4.38732300, 15.32837900, -4.30464500, 15.30772200, '#D9BA96', '2025-10-14 11:09:38'),
+	(24, 'L3', 'KISANGANI - KINMAZIERE', 15.90, '90', 'actif', -4.41024300, 15.41120100, -4.30560400, 15.31344600, '#3BF4F7', '2025-10-16 02:33:27'),
+	(25, 'L4', 'MASINA Q3 - PLACE DES EVOLUEE', 15.00, '88', 'actif', -4.40472700, 15.37819200, -4.30610200, 15.28586300, '#943841', '2025-10-16 02:38:03'),
+	(26, 'L5', 'NGIRI NGIRI - GARE CENTRAL', 5.88, '30', 'actif', -4.35633600, 15.29937000, -4.30711700, 15.31872100, '#E7451D', '2025-10-16 02:49:16'),
+	(27, 'L6', 'MASINA Q1 - BATETELA', 12.96, '46', 'actif', -4.38629900, 15.39676300, -4.34928400, 15.28591800, '#EAF73B', '2025-10-16 04:44:03'),
+	(28, 'L7', 'KAPELA - CLINIC NGALIEMA', 7.21, '38', 'actif', -4.35697600, 15.32032300, -4.31463500, 15.27104800, '#B1359A', '2025-10-21 16:36:46'),
+	(29, 'L8', 'RP NGABA - PLACE DES EVOLUE', 9.70, '53', 'actif', -4.38936600, 15.31199400, -4.30610200, 15.28586300, '#33D136', '2025-10-21 18:32:31');
 
 -- Listage de la structure de table safari_smart_mobility. trajets_effectues
 CREATE TABLE IF NOT EXISTS `trajets_effectues` (
@@ -1092,12 +1176,12 @@ CREATE TABLE IF NOT EXISTS `utilisateurs` (
 -- Listage des données de la table safari_smart_mobility.utilisateurs : ~8 rows (environ)
 INSERT INTO `utilisateurs` (`id`, `nom`, `email`, `mot_de_passe`, `departement`, `role`, `statut`, `avatar`, `derniere_connexion`, `date_creation`) VALUES
 	(1, 'Superviseur Planification', 'admin.pl@safari.cd', '$argon2id$v=19$m=65536,t=4,p=1$MWVZSm9PZFdjWnhBNzVlSg$/1PvHawr7q6CyhaIsm8X+DqolE2rqEZdgzrIbT74YMQ', 'PL', 'supervisor', 'actif', 'SP', '2025-10-08 15:47:48', '2025-10-08 15:18:56'),
-	(2, 'Admin Billetterie', 'admin.bt@safari.cd', '$argon2id$v=19$m=65536,t=4,p=1$MWVZSm9PZFdjWnhBNzVlSg$/1PvHawr7q6CyhaIsm8X+DqolE2rqEZdgzrIbT74YMQ', 'BT', 'admin', 'actif', 'AB', '2025-10-14 15:46:45', '2025-10-08 15:18:56'),
+	(2, 'Admin Billetterie', 'admin.bt@safari.cd', '$argon2id$v=19$m=65536,t=4,p=1$MWVZSm9PZFdjWnhBNzVlSg$/1PvHawr7q6CyhaIsm8X+DqolE2rqEZdgzrIbT74YMQ', 'BT', 'admin', 'actif', 'AB', '2025-10-16 21:28:29', '2025-10-08 15:18:56'),
 	(3, 'Admin RH', 'admin.rh@safari.cd', '$argon2id$v=19$m=65536,t=4,p=1$MWVZSm9PZFdjWnhBNzVlSg$/1PvHawr7q6CyhaIsm8X+DqolE2rqEZdgzrIbT74YMQ', 'RH', 'admin', 'actif', 'RH', '2025-10-11 04:49:46', '2025-10-08 15:18:56'),
 	(4, 'Landry Mwanda', 'landry.pl@safari.cd', '$argon2id$v=19$m=65536,t=4,p=1$MWVZSm9PZFdjWnhBNzVlSg$/1PvHawr7q6CyhaIsm8X+DqolE2rqEZdgzrIbT74YMQ', 'PL', 'operator', 'actif', 'KM', '2025-10-08 16:11:38', '2025-10-08 15:18:56'),
 	(5, 'Larry Kaboba', 'larry.kaboba@safari.cd', '$argon2id$v=19$m=65536,t=4,p=1$MWVZSm9PZFdjWnhBNzVlSg$/1PvHawr7q6CyhaIsm8X+DqolE2rqEZdgzrIbT74YMQ', 'BT', 'operator', 'actif', 'LK', NULL, '2025-10-08 15:18:56'),
 	(6, 'Marie Tshala', 'marie.tshala@safari.cd', '$argon2id$v=19$m=65536,t=4,p=1$MWVZSm9PZFdjWnhBNzVlSg$/1PvHawr7q6CyhaIsm8X+DqolE2rqEZdgzrIbT74YMQ', 'RH', 'viewer', 'actif', 'MT', NULL, '2025-10-08 15:18:56'),
-	(7, 'Kyle Masangu', 'admin.all@safari.cd', '$argon2id$v=19$m=65536,t=4,p=1$MWVZSm9PZFdjWnhBNzVlSg$/1PvHawr7q6CyhaIsm8X+DqolE2rqEZdgzrIbT74YMQ', 'PL', 'admin', 'actif', 'KM', '2025-10-16 00:17:48', '2025-10-08 15:28:58'),
+	(7, 'Kyle Masangu', 'admin.all@safari.cd', '$argon2id$v=19$m=65536,t=4,p=1$MWVZSm9PZFdjWnhBNzVlSg$/1PvHawr7q6CyhaIsm8X+DqolE2rqEZdgzrIbT74YMQ', 'PL', 'admin', 'actif', 'KM', '2025-10-23 11:33:01', '2025-10-08 15:28:58'),
 	(8, 'Testeur 1', 'testeur1.pl@safari.com', '$2y$10$OYsD.ULr8jq.PZQyf1ocR.jkAuDQ2t.Utru52aSkWWsj/wzvtwxPe', 'PL', 'viewer', 'inactif', 'T1', NULL, '2025-10-13 22:06:15');
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;

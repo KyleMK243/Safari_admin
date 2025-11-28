@@ -15,7 +15,7 @@ class TrajetsController {
     }
 
     /**
-     * Afficher la liste des trajets avec pagination
+     * Afficher la liste des trajets avec pagination (vue BC)
      */
     public function index() {
         try {
@@ -36,24 +36,74 @@ class TrajetsController {
             $paginationStart = $offset + 1;
             $paginationEnd = min($offset + count($trajets), $totalTrajets);
 
-            // Compter les arrêts et points de chifte pour chaque trajet
+            // Compter les arrêts, points de chifte et bus pour chaque trajet
             $arretsCount = [];
             $pointsChifteCount = [];
+            $busCount = [];
             
             foreach ($trajets as $trajet) {
                 $arrets = $this->trajetModel->getArretsByTrajet($trajet['id']);
                 $pointsChifte = $this->trajetModel->getPointsChifteByTrajet($trajet['id']);
+                $busAffectes = $this->trajetModel->getBusByTrajet($trajet['id']);
                 
                 $arretsCount[$trajet['id']] = count($arrets);
                 $pointsChifteCount[$trajet['id']] = count($pointsChifte);
+                $busCount[$trajet['id']] = count($busAffectes);
             }
 
-            // Charger la vue
+            // Vue BC (menu Bureau de conception)
             require VIEW_PATH . '/trajets.php';
         } catch (Exception $e) {
             logMessage("Erreur lors du chargement de la page trajets: " . $e->getMessage(), "ERROR");
             $_SESSION['error'] = "Erreur lors du chargement des données";
-            redirect('/dashboard_' . $_SESSION['departement']);
+            redirect('/dashboard_BC');
+        }
+    }
+
+    /**
+     * Afficher la liste des trajets avec pagination (vue PL)
+     */
+    public function indexPL() {
+        try {
+            // Pagination par défaut
+            $limit = 10;
+            $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+            $currentPage = max($currentPage, 1); // jamais < 1
+            $offset = ($currentPage - 1) * $limit;
+
+            // Récupérer les trajets
+            $trajets = $this->trajetModel->getTrajets($limit, $offset);
+
+            // Nombre total de trajets
+            $totalTrajets = $this->trajetModel->compterTrajets();
+
+            // Calcul des infos de pagination
+            $totalPages = ceil($totalTrajets / $limit);
+            $paginationStart = $offset + 1;
+            $paginationEnd = min($offset + count($trajets), $totalTrajets);
+
+            // Compter les arrêts, points de chifte et bus pour chaque trajet
+            $arretsCount = [];
+            $pointsChifteCount = [];
+            $busCount = [];
+            
+            foreach ($trajets as $trajet) {
+                $arrets = $this->trajetModel->getArretsByTrajet($trajet['id']);
+                $pointsChifte = $this->trajetModel->getPointsChifteByTrajet($trajet['id']);
+                $busAffectes = $this->trajetModel->getBusByTrajet($trajet['id']);
+                
+                $arretsCount[$trajet['id']] = count($arrets);
+                $pointsChifteCount[$trajet['id']] = count($pointsChifte);
+                $busCount[$trajet['id']] = count($busAffectes);
+            }
+
+            // Vue PL (menu Planification)
+            $menuContext = 'PL';
+            require VIEW_PATH . '/trajets.php';
+        } catch (Exception $e) {
+            logMessage("Erreur lors du chargement de la page trajets PL: " . $e->getMessage(), "ERROR");
+            $_SESSION['error'] = "Erreur lors du chargement des données";
+            redirect('/dashboard_PL');
         }
     }
 
@@ -166,19 +216,69 @@ class TrajetsController {
                 throw new Exception("Trajet non trouvé");
             }
 
-            // Récupérer les arrêts et points de chifte
+            // Récupérer les arrêts, points de chifte et bus affectés
             $arrets = $this->trajetModel->getArretsByTrajet($trajetId);
             $pointsChifte = $this->trajetModel->getPointsChifteByTrajet($trajetId);
+            $bus = $this->trajetModel->getBusByTrajet($trajetId);
 
             echo json_encode([
                 'success' => true,
                 'trajet' => $trajet,
                 'arrets' => $arrets,
-                'pointsChifte' => $pointsChifte
+                'pointsChifte' => $pointsChifte,
+                'bus' => $bus
             ]);
 
         } catch (Exception $e) {
             http_response_code(404);
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+        exit;
+    }
+
+    /**
+     * Changer le statut d'un trajet (actif / inactif) - AJAX
+     */
+    public function toggleStatut() {
+        header('Content-Type: application/json');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['success' => false, 'message' => 'Méthode non autorisée']);
+            exit;
+        }
+
+        try {
+            $data = json_decode(file_get_contents('php://input'), true);
+
+            if (!$data || empty($data['id'])) {
+                throw new Exception("ID du trajet manquant");
+            }
+
+            $trajetId = (int) $data['id'];
+
+            // Vérifier si le trajet existe
+            $trajet = $this->trajetModel->getTrajetById($trajetId);
+            if (!$trajet) {
+                throw new Exception("Trajet non trouvé");
+            }
+
+            $statutActuel = $trajet['statut'] ?? 'actif';
+            $nouveauStatut = $statutActuel === 'actif' ? 'inactif' : 'actif';
+
+            $this->trajetModel->changerStatutTrajet($trajetId, $nouveauStatut);
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Statut mis à jour avec succès',
+                'statut' => $nouveauStatut
+            ]);
+
+        } catch (Exception $e) {
+            http_response_code(400);
             echo json_encode([
                 'success' => false,
                 'message' => $e->getMessage()
@@ -411,6 +511,7 @@ class TrajetsController {
             // Préparer les données du trajet
             $trajetData = [
                 'nom' => $data['nom'],
+                'code' => isset($data['code']) ? trim($data['code']) : null,
                 'statut' => $data['statut'] ?? 'actif',
                 'couleur' => $data['couleur'] ?? null,
                 'distance_totale' => $data['distance_totale'] ?? 0,
@@ -422,8 +523,9 @@ class TrajetsController {
 
             // Créer ou mettre à jour le trajet
             if (!empty($data['id'])) {
-                // Mise à jour
+                // Mise à jour : on ne change PAS le code ici
                 $trajetId = (int) $data['id'];
+                unset($trajetData['code']);
                 $this->trajetModel->mettreAJourTrajet($trajetId, $trajetData);
                 
                 // Supprimer les anciens arrêts et shifts

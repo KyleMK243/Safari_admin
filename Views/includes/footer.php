@@ -1,1 +1,1 @@
-<footer class="footer">© 2024 Dare-Dare. Tous droits réservés. Propulsé par l'intelligence des données.</footer>
+<footer class="footer">&copy; 2025 Pimacle RDC. Tous droits réservés. Fait avec <i data-feather="heart"></i> en RDC 🇨🇩</footer>

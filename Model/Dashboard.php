@@ -11,78 +11,121 @@ class Dashboard {
      * Récupérer tous les bus actifs avec leurs informations
      */
     public function getBusActifs() {
-        try {
-            error_log("=== MODEL: getBusActifs appelé ===");
-            
-            $sql = "SELECT 
-                        b.id,
-                        b.numero,
-                        b.immatriculation,
-                        b.marque,
-                        b.modele,
-                        b.capacite,
-                        b.kilometrage,
-                        b.trajet_id,
-                        b.statut,
-                        b.modules,
-                        b.derniere_activite,
-                        b.latitude,
-                        b.longitude,
-                        t.nom as trajet_nom,
-                        t.code as trajet_code,
-                        t.distance_totale,
-                        COALESCE(
-                            (SELECT e.nom 
-                             FROM equipe_bord e 
-                             WHERE e.bus_affecte = b.numero 
-                             AND e.poste = 'chauffeur'
-                             AND e.statut = 'actif'
-                             LIMIT 1), 
-                            'Non assigné'
-                        ) as chauffeur_nom
-                    FROM bus b
-                    LEFT JOIN trajets t ON b.trajet_id = t.id
-                    WHERE b.statut IN ('actif', 'maintenance', 'panne')
-                    ORDER BY b.numero ASC";
-            
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute();
-            $buses = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
-            error_log("Nombre de bus trouvés dans la BDD: " . count($buses));
-        } catch (PDOException $e) {
-            error_log("❌ ERREUR SQL getBusActifs: " . $e->getMessage());
-            error_log("Code erreur: " . $e->getCode());
-            return [];
-        }
-        
-        // Ajouter les données de position pour chaque bus
+        $buses = [
+            [
+                'id' => 421,
+                'numero' => '421',
+                'immatriculation' => 'CD-421-ABC',
+                'marque' => 'Mercedes',
+                'modele' => 'Citaro',
+                'capacite' => 80,
+                'kilometrage' => 123456,
+                'trajet_id' => 1,
+                'statut' => 'actif',
+                'modules' => 'DATCHA,WIFI,POS',
+                'derniere_activite' => date('Y-m-d H:i:s', strtotime('-5 minutes')),
+                'latitude' => null,
+                'longitude' => null,
+                'trajet_nom' => 'Centre Ville - Kasapa',
+                'trajet_code' => 'L1',
+                'distance_totale' => 14.5
+            ],
+            [
+                'id' => 105,
+                'numero' => '105',
+                'immatriculation' => 'CD-105-DEF',
+                'marque' => 'Toyota',
+                'modele' => 'Coaster',
+                'capacite' => 60,
+                'kilometrage' => 98765,
+                'trajet_id' => 1,
+                'statut' => 'actif',
+                'modules' => 'DATCHA,POS',
+                'derniere_activite' => date('Y-m-d H:i:s', strtotime('-12 minutes')),
+                'latitude' => null,
+                'longitude' => null,
+                'trajet_nom' => 'Centre Ville - Kasapa',
+                'trajet_code' => 'L1',
+                'distance_totale' => 14.5
+            ],
+            [
+                'id' => 202,
+                'numero' => '202',
+                'immatriculation' => 'CD-202-GHI',
+                'marque' => 'Hyundai',
+                'modele' => 'County',
+                'capacite' => 55,
+                'kilometrage' => 150230,
+                'trajet_id' => 2,
+                'statut' => 'maintenance',
+                'modules' => 'DATCHA',
+                'derniere_activite' => date('Y-m-d H:i:s', strtotime('-1 hour')),
+                'latitude' => null,
+                'longitude' => null,
+                'trajet_nom' => 'Kasapa - Plateau Karavia',
+                'trajet_code' => 'L2',
+                'distance_totale' => 18.2
+            ],
+            [
+                'id' => 512,
+                'numero' => '512',
+                'immatriculation' => 'CD-512-JKL',
+                'marque' => 'Mercedes',
+                'modele' => 'Sprinter',
+                'capacite' => 40,
+                'kilometrage' => 201500,
+                'trajet_id' => 2,
+                'statut' => 'panne',
+                'modules' => 'DATCHA,WIFI',
+                'derniere_activite' => date('Y-m-d H:i:s', strtotime('-2 hours')),
+                'latitude' => null,
+                'longitude' => null,
+                'trajet_nom' => 'Kasapa - Plateau Karavia',
+                'trajet_code' => 'L2',
+                'distance_totale' => 18.2
+            ],
+            [
+                'id' => 238,
+                'numero' => '238',
+                'immatriculation' => 'CD-238-MNO',
+                'marque' => 'Mercedes',
+                'modele' => 'Citaro',
+                'capacite' => 80,
+                'kilometrage' => 110000,
+                'trajet_id' => 3,
+                'statut' => 'actif',
+                'modules' => 'DATCHA,WIFI',
+                'derniere_activite' => date('Y-m-d H:i:s', strtotime('-20 minutes')),
+                'latitude' => null,
+                'longitude' => null,
+                'trajet_nom' => 'Centre Ville - Zone Ouest',
+                'trajet_code' => 'L3',
+                'distance_totale' => 12.8
+            ]
+        ];
+
         $busAvecPosition = 0;
         $busSansPosition = 0;
-        
+
         foreach ($buses as &$bus) {
             // Si le bus a des coordonnées GPS, les utiliser
             if (!empty($bus['latitude']) && !empty($bus['longitude'])) {
                 $bus['position'] = [
                     'lat' => (float)$bus['latitude'],
                     'lng' => (float)$bus['longitude'],
-                    'vitesse' => '-',  // Non disponible pour l'instant
-                    'carburant' => '-',  // Non disponible pour l'instant
-                    'temperature' => '-',  // Non disponible pour l'instant
+                    'vitesse' => '-',
+                    'carburant' => '-',
+                    'temperature' => '-',
                     'localisation' => $this->genererNomLocalisation()
                 ];
                 $busAvecPosition++;
-                error_log("✅ Bus #{$bus['numero']}: Position GPS ({$bus['latitude']}, {$bus['longitude']})");
             } else {
                 // Sinon, simuler une position
                 $bus['position'] = $this->simulerPositionBus($bus);
                 $busSansPosition++;
-                error_log("⚠️ Bus #{$bus['numero']}: Pas de GPS, position simulée");
             }
         }
-        
-        error_log("=== DASHBOARD: {$busAvecPosition} bus avec GPS, {$busSansPosition} bus simulés ===");
-        
+
         return $buses;
     }
 
@@ -90,31 +133,51 @@ class Dashboard {
      * Récupérer tous les trajets avec leurs points
      */
     public function getTrajets() {
-        $sql = "SELECT 
-                    id,
-                    code,
-                    nom,
-                    distance_totale,
-                    duree_estimee,
-                    statut,
-                    latitude_depart,
-                    longitude_depart,
-                    latitude_arrivee,
-                    longitude_arrivee
-                FROM trajets
-                WHERE statut = 'actif'
-                ORDER BY id ASC";
-        
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute();
-        $trajets = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+        $trajets = [
+            [
+                'id' => 1,
+                'code' => 'L1',
+                'nom' => 'Centre Ville - Kasapa',
+                'distance_totale' => 14.5,
+                'duree_estimee' => 35,
+                'statut' => 'actif',
+                'latitude_depart' => -11.666,
+                'longitude_depart' => 27.480,
+                'latitude_arrivee' => -11.675,
+                'longitude_arrivee' => 27.500
+            ],
+            [
+                'id' => 2,
+                'code' => 'L2',
+                'nom' => 'Kasapa - Plateau Karavia',
+                'distance_totale' => 18.2,
+                'duree_estimee' => 40,
+                'statut' => 'actif',
+                'latitude_depart' => -11.675,
+                'longitude_depart' => 27.500,
+                'latitude_arrivee' => -11.690,
+                'longitude_arrivee' => 27.520
+            ],
+            [
+                'id' => 3,
+                'code' => 'L3',
+                'nom' => 'Centre Ville - Zone Ouest',
+                'distance_totale' => 12.8,
+                'duree_estimee' => 30,
+                'statut' => 'actif',
+                'latitude_depart' => -11.660,
+                'longitude_depart' => 27.470,
+                'latitude_arrivee' => -11.670,
+                'longitude_arrivee' => 27.450
+            ]
+        ];
+
         // Ajouter les coordonnées de départ et d'arrivée
         foreach ($trajets as &$trajet) {
             // Si les coordonnées GPS existent dans la BDD, les utiliser
             if (!empty($trajet['latitude_depart']) && !empty($trajet['longitude_depart']) &&
                 !empty($trajet['latitude_arrivee']) && !empty($trajet['longitude_arrivee'])) {
-                
+
                 $trajet['coordonnees'] = [
                     'depart' => [
                         'lat' => (float)$trajet['latitude_depart'],
@@ -130,7 +193,7 @@ class Dashboard {
                 $trajet['coordonnees'] = $this->genererCoordonneesTrajet($trajet['id']);
             }
         }
-        
+
         return $trajets;
     }
 
@@ -138,28 +201,38 @@ class Dashboard {
      * Récupérer tous les points de shift
      */
     public function getPointsShift() {
-        $sql = "SELECT 
-                    ps.id,
-                    ps.trajet_id,
-                    ps.nom,
-                    ps.distance_avec_debut,
-                    t.nom as trajet_nom
-                FROM points_chifte ps
-                LEFT JOIN trajets t ON ps.trajet_id = t.id
-                ORDER BY ps.trajet_id, ps.distance_avec_debut ASC";
-        
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute();
-        $points = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+        $points = [
+            [
+                'id' => 1,
+                'trajet_id' => 1,
+                'nom' => 'Shift Matin - Centre Ville',
+                'distance_avec_debut' => 5,
+                'trajet_nom' => 'Centre Ville - Kasapa'
+            ],
+            [
+                'id' => 2,
+                'trajet_id' => 1,
+                'nom' => 'Shift Soir - Kasapa',
+                'distance_avec_debut' => 12,
+                'trajet_nom' => 'Centre Ville - Kasapa'
+            ],
+            [
+                'id' => 3,
+                'trajet_id' => 2,
+                'nom' => 'Shift Matin - Plateau Karavia',
+                'distance_avec_debut' => 6,
+                'trajet_nom' => 'Kasapa - Plateau Karavia'
+            ]
+        ];
+
         // Ajouter des coordonnées pour chaque point
         foreach ($points as &$point) {
             $point['coordonnees'] = $this->calculerPositionSurTrajet(
-                $point['trajet_id'], 
+                $point['trajet_id'],
                 $point['distance_avec_debut']
             );
         }
-        
+
         return $points;
     }
 
@@ -167,29 +240,41 @@ class Dashboard {
      * Récupérer tous les arrêts
      */
     public function getArrets() {
-        $sql = "SELECT 
-                    a.id,
-                    a.trajet_id,
-                    a.nom,
-                    a.distance_avec_debut,
-                    a.temps_arret,
-                    t.nom as trajet_nom
-                FROM arrets a
-                LEFT JOIN trajets t ON a.trajet_id = t.id
-                ORDER BY a.trajet_id, a.distance_avec_debut ASC";
-        
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute();
-        $arrets = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+        $arrets = [
+            [
+                'id' => 1,
+                'trajet_id' => 1,
+                'nom' => 'Arrêt Gecamine',
+                'distance_avec_debut' => 3,
+                'temps_arret' => 2,
+                'trajet_nom' => 'Centre Ville - Kasapa'
+            ],
+            [
+                'id' => 2,
+                'trajet_id' => 1,
+                'nom' => 'Arrêt Golf',
+                'distance_avec_debut' => 8,
+                'temps_arret' => 3,
+                'trajet_nom' => 'Centre Ville - Kasapa'
+            ],
+            [
+                'id' => 3,
+                'trajet_id' => 2,
+                'nom' => 'Arrêt Kasapa',
+                'distance_avec_debut' => 4,
+                'temps_arret' => 2,
+                'trajet_nom' => 'Kasapa - Plateau Karavia'
+            ]
+        ];
+
         // Ajouter des coordonnées pour chaque arrêt
         foreach ($arrets as &$arret) {
             $arret['coordonnees'] = $this->calculerPositionSurTrajet(
-                $arret['trajet_id'], 
+                $arret['trajet_id'],
                 $arret['distance_avec_debut']
             );
         }
-        
+
         return $arrets;
     }
 
@@ -197,26 +282,38 @@ class Dashboard {
      * Récupérer les informations détaillées d'un bus
      */
     public function getDetailsBus($busId) {
-        $sql = "SELECT 
-                    b.*,
-                    t.nom as trajet_nom,
-                    t.code as trajet_code,
-                    t.distance_totale,
-                    t.duree_estimee
-                FROM bus b
-                LEFT JOIN trajets t ON b.ligne_affectee = t.id
-                WHERE b.id = :id";
-        
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':id' => $busId]);
-        $bus = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+        $buses = $this->getBusActifs();
+        $bus = null;
+
+        foreach ($buses as $item) {
+            if ((int)$item['id'] === (int)$busId) {
+                $bus = $item;
+                break;
+            }
+        }
+
         if ($bus) {
-            // Récupérer les équipes
-            $bus['equipes'] = $this->getEquipesBus($bus['numero']);
+            $bus['equipes'] = [
+                [
+                    'id' => 1,
+                    'nom' => 'Jean-Pierre Mukendi',
+                    'matricule' => 'DRV-2024-158',
+                    'poste' => 'chauffeur',
+                    'telephone' => '+243 812 345 678',
+                    'email' => 'jean.mukendi@example.com'
+                ],
+                [
+                    'id' => 2,
+                    'nom' => 'Marie Tshala',
+                    'matricule' => 'RCV-2024-089',
+                    'poste' => 'receveur',
+                    'telephone' => '+243 823 456 789',
+                    'email' => 'marie.tshala@example.com'
+                ]
+            ];
             $bus['position'] = $this->simulerPositionBus($bus);
         }
-        
+
         return $bus;
     }
 
@@ -392,41 +489,20 @@ class Dashboard {
      * Récupérer les statistiques du jour
      */
     public function getStatistiquesJour() {
-        $today = date('Y-m-d');
-        
-        // Bus actifs
-        $sql = "SELECT COUNT(*) as total FROM bus WHERE statut = 'actif'";
-        $stmt = $this->db->query($sql);
-        $busActifs = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
-        
-        // Shifts en cours
-        $sql = "SELECT COUNT(*) as total FROM shifts 
-                WHERE date_prevue = :today AND statut = 'actif'";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':today' => $today]);
-        $shiftsActifs = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
-        
-        // Passagers du jour
-        $sql = "SELECT COUNT(*) as total FROM billets 
-                WHERE DATE(date_achat) = :today 
-                AND statut_billet IN ('paye', 'utilise')";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':today' => $today]);
-        $passagers = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
-        
-        // Revenus du jour
-        $sql = "SELECT COALESCE(SUM(prix_paye), 0) as total FROM billets 
-                WHERE DATE(date_achat) = :today 
-                AND statut_billet IN ('paye', 'utilise')";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':today' => $today]);
-        $revenus = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
-        
+        $buses = $this->getBusActifs();
+        $busActifs = 0;
+
+        foreach ($buses as $bus) {
+            if ($bus['statut'] === 'actif') {
+                $busActifs++;
+            }
+        }
+
         return [
             'bus_actifs' => $busActifs,
-            'shifts_actifs' => $shiftsActifs,
-            'passagers' => $passagers,
-            'revenus' => $revenus
+            'shifts_actifs' => 4,
+            'passagers' => 320,
+            'revenus' => 125000
         ];
     }
 }

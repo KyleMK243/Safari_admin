@@ -62,39 +62,34 @@ class AuthController {
             exit;
         }
 
-        // Tentative de connexion
-        $utilisateur = $this->utilisateurModel->connecter($email, $motDePasse);
+        // Tentative de connexion (mode maquette : pas de vérification en base)
+        $utilisateur = [
+            'id' => 1,
+            'nom' => 'Utilisateur Démo',
+            'email' => $email,
+            'role' => 'admin',
+            'departement' => 'BC', // Bureau de conception
+            'avatar' => null,
+        ];
 
-        if ($utilisateur) {
-            // Régénérer l'ID de session (sécurité)
-            session_regenerate_id(true);
-            
-            // Stocker les informations dans la session
-            $_SESSION['user_id'] = $utilisateur['id'];
-            $_SESSION['nom'] = $utilisateur['nom'];
-            $_SESSION['email'] = $utilisateur['email'];
-            $_SESSION['role'] = $utilisateur['role'];
-            $_SESSION['departement'] = $utilisateur['departement'];
-            $_SESSION['avatar'] = $utilisateur['avatar'];
-            $_SESSION['last_activity'] = time();
-            
-            // Logger la connexion
-            logMessage("Connexion réussie pour l'utilisateur: {$utilisateur['email']} (ID: {$utilisateur['id']})", "INFO");
-            
-            // Redirection selon le département
-            $this->redirigerSelonDepartement($utilisateur['departement']);
-            exit;
-            
-        } else {
-            // Échec de connexion
-            logMessage("Tentative de connexion échouée pour: $email", "WARNING");
-            
-            $_SESSION['error'] = "Email ou mot de passe incorrect.";
-            $_SESSION['old_email'] = $email; // Pour pré-remplir le formulaire
-            
-            redirect('/');
-            exit;
-        }
+        // Régénérer l'ID de session (sécurité)
+        session_regenerate_id(true);
+        
+        // Stocker les informations dans la session
+        $_SESSION['user_id'] = $utilisateur['id'];
+        $_SESSION['nom'] = $utilisateur['nom'];
+        $_SESSION['email'] = $utilisateur['email'];
+        $_SESSION['role'] = $utilisateur['role'];
+        $_SESSION['departement'] = $utilisateur['departement'];
+        $_SESSION['avatar'] = $utilisateur['avatar'];
+        $_SESSION['last_activity'] = time();
+        
+        // Logger la connexion démo
+        logMessage("Connexion DEMO pour l'utilisateur: {$utilisateur['email']} (ID: {$utilisateur['id']})", "INFO");
+        
+        // Redirection selon le département
+        $this->redirigerSelonDepartement($utilisateur['departement']);
+        exit;
     }
 
     /**
@@ -199,6 +194,11 @@ class AuthController {
             case 'RH':
                 // Ressources Humaines
                 redirect('/rh-dashboard');
+                break;
+            
+            case 'BC':
+                // Bureau de conception
+                redirect('/dashboard_BC');
                 break;
                 
             default:
